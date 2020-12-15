@@ -18,6 +18,8 @@ IMPORTANT NOTE: this script will walk the user through tLeAP so as to balance th
 
 protein-ligand COMPLEX + water ONLY = protein ONLY + ligand only
 
+NOTE: The GUI downloads with a preloaded example files for geldanamycin bound to the Hsp90 chaperone protein (PDB: 1yet)
+
 ALSO NOTE: use a slightly larger water box than you would in normal MD simulation. If any MD runs abort due to unstable box boundaries, then increase the water box size and restart from the beginning. The box size on the GUI indicates the buffer distance from the surface of the protein or ligand to the edge of the water box. Because the ligand and single starting water molecule used to build the empty water simulation are so much smaller than a typical protein, a buffer size of 1.5 times the box size is used to build the ligand ONLY and water ONLY systems. 
 
 ![image](/ENTHALPYgui.png)
