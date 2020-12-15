@@ -28,14 +28,14 @@ my $fileIDl = '1yet_ligand';
 my $fileIDw = 'singleWater';
 my $forceID = 'leaprc.protein.ff14SB';
 my $dforceID = 'leaprc.gaff2';
-my $runsID = '5';
+my $runsID = '10';
 my $implicit=0;
 my $explicit=0;
 my $solvType = 'ex';
 my $chainN = 1;
-my $cutoffValueHeat=100;
-my $cutoffValueEq=1;
-my $cutoffValueProd=1;
+my $cutoffValueHeat=300;
+my $cutoffValueEq=5;
+my $cutoffValueProd=0.5;
 my $cutoffValueSalt=0.0;
 my $cutoffValueHeatFS=0;
 my $cutoffValueEqFS=0;
@@ -77,10 +77,10 @@ my $MDprodScale = $mw->Scale(-label=>"Length of each MD sample run (ns) :",
 			-orient=>'h',
 			-digit=>3,
 			-from=>0,
-			-to=>20,
+			-to=>1,
 			-variable=>\$cutoffValueProd,
-			-tickinterval=>5,
-			-resolution=>1,
+			-tickinterval=>0.2,
+			-resolution=>0.05,
 			-length=>205
 			);
 
@@ -354,7 +354,7 @@ sleep(2);
 	# convert all times to femtosec
 	$cutoffValueHeatFS = $cutoffValueHeat*1000;
 	$cutoffValueEqFS = $cutoffValueEq*1000000;
-	$cutoffValueProdFS = $cutoffValueProd*1000000;
+	$cutoffValueProdFS = $cutoffValueProd*1000;
 
    
 ### make query protein control file ###
