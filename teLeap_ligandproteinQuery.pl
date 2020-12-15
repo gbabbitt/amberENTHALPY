@@ -89,7 +89,8 @@ my $len_eq = $Equilibration_Time; # Length of equilibration run in fs
 my $len_heat = $Heating_Time; # Length of heat run in fs
 my $forcefield = $Force_Field; # specify AMBER forcefield
 my $ligandfield = $LIGAND_Field; # specify AMBER DNA forcefield
-
+# define larger box for water only
+my $Large_Box_Size = 1.15*$Box_Size;
 =pod
 
 if (-e "$protein_label.pdb") { print "$protein_label.pdb found\n"; }
@@ -102,14 +103,15 @@ if (-e "$protein_label.pdb") { print "$protein_label.pdb found\n"; }
 ####################################################################
 # Ligand: Prepare the input file for tleap 
 ####################################################################
-$Large_Box_Size = 1.5*$Box_Size;
+
+
 open(LEAP_WATER, ">"."$water_label.bat") or die "could not open LEAP file\n";
 	print LEAP_WATER "source "."$teleap_path"."leaprc.water.tip3p\n";
      print LEAP_WATER "water$water_label = loadpdb $water_label.pdb\n";
      print LEAP_WATER "check water$water_label\n";
      #print LEAP_WATER "solvateoct water$water_label TIP3PBOX $Box_Size\n";
      print LEAP_WATER "solvateBox water$water_label TIP3PBOX {$Large_Box_Size $Large_Box_Size $Large_Box_Size}\n";
-     print LEAP_WATER "saveamberparm water$water_label wat"."_$water_label.prmtop wat"."_$water_label.inpcrd\n";
+     #print LEAP_WATER "saveamberparm water$water_label wat"."_$water_label.prmtop wat"."_$water_label.inpcrd\n";
      print LEAP_WATER "savepdb water$water_label "."$water_label"."edit.pdb\n";
      print LEAP_WATER "quit\n";
 close LEAP_WATER;
@@ -132,7 +134,7 @@ open(LEAP_LIGAND, ">"."$ligand_label.bat") or die "could not open LEAP file\n";
      #print LEAP_LIGAND "addions ligand$ligand_label Na+ 0\n"; # only use to charge or neutralize explicit solvent
 	#print LEAP_LIGAND "addions ligand$ligand_label Cl- 0\n"; # only use to charge or neutralize explicit solvent
      #print LEAP_LIGAND "saveamberparm ligand$ligand_label ion_$ligand_label.prmtop ion_$ligand_label.inpcrd\n";
-	print LEAP_LIGAND "solvateBox ligand$ligand_label TIP3PBOX {$Large_Box_Size $Large_Box_Size $Large_Box_Size}\n";
+	print LEAP_LIGAND "solvateBox ligand$ligand_label TIP3PBOX {$Box_Size $Box_Size $Box_Size}\n";
      #print LEAP_LIGAND "solvateoct ligand$ligand_label TIP3PBOX $Box_Size\n";
 	print LEAP_LIGAND "saveamberparm ligand$ligand_label wat"."_$ligand_label.prmtop wat"."_$ligand_label.inpcrd\n";
      print LEAP_LIGAND "savepdb ligand$ligand_label "."$ligand_label"."edit.pdb\n";
@@ -141,24 +143,6 @@ close LEAP_LIGAND;
 
 print "  preparing ligand input file for teLeap\n\n";
 sleep(1);
-####################################################################
-# Protein: Prepare the input file for tleap 
-####################################################################
-#open(LEAP_PROTEIN, ">"."$protein_labelR.bat") or die "could not open LEAP file\n";
-#	print LEAP_PROTEIN "source "."$teleap_path"."$forcefield\n";
-#	print LEAP_PROTEIN "source "."$teleap_path"."leaprc.water.tip3p\n";
-#     print LEAP_PROTEIN "protein$protein_labelR = loadpdb $protein_labelR.pdb\n";
-#	print LEAP_PROTEIN "saveamberparm protein$protein_labelR vac_$protein_labelR.prmtop vac_$protein_labelR.inpcrd\n";
-#	print LEAP_PROTEIN "addions complex$protein_labelR Na+ 0\n"; # to charge or neutralize explicit solvent
-#	print LEAP_PROTEIN "addions complex$protein_labelR Cl- 0\n"; # to charge or neutralize explicit solvent
-#     print LEAP_PROTEIN "saveamberparm protein$protein_labelR ion_$protein_labelR.prmtop ion_$protein_labelR.inpcrd\n";
-#	print LEAP_PROTEIN "solvateoct protein$protein_labelR TIP3PBOX $Box_Size\n";
-#	print LEAP_PROTEIN "saveamberparm protein$protein_labelR wat"."_$protein_labelR.prmtop wat"."_$protein_labelR.inpcrd\n";
-#	print LEAP_PROTEIN "quit\n";
-#close LEAP_PROTEIN;
-
-#print "  preparing unbound protein input file for teLeap\n\n";
-#sleep(1);
 
 ####################################################################
 # Ligand-Protein complex: create file for tleap 

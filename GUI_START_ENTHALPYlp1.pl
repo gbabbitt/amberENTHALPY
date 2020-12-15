@@ -174,7 +174,7 @@ my $pdbFrame = $mw->Frame();
 					-textvariable=>\$chainN
 					);
      my $boxFrame = $pdbFrame->Frame();
-		my $boxLabel = $boxFrame->Label(-text=>"size of water octahedral box (e.g. 40 angstom buffer): ");
+		my $boxLabel = $boxFrame->Label(-text=>"size of water octahedral box (e.g. 30 angstom buffer): ");
 		my $boxEntry = $boxFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$octBox
@@ -606,6 +606,175 @@ open (LEAP, ">"."leap.log");  # erases prior log entries
 close LEAP;
 system "perl teLeap_ligandproteinQuery.pl\n";
 system "perl teLeap_ligandproteinReference.pl\n";
+
+# count waters in 'edit.pdb' files
+open (LEAP, "<"."$fileIDw"."REDUCEDedit.pdb");
+@LEAP = <LEAP>;
+$water_counter = 0;
+for (my $l = 0; $l < scalar @LEAP; $l++){
+     my $LEAProw = $LEAP[$l];
+	my @LEAProw = split (/\s+/, $LEAProw);
+	if ($LEAProw =~ m/WAT/ && $LEAProw =~ m/ATOM/){
+          print "$LEAProw\n";$water_counter = $water_counter+1;
+          }
+    }
+$water_waters = $water_counter/3; # each water has 3 atoms
+close LEAP;
+open (LEAP, "<"."$fileIDl"."REDUCEDedit.pdb");
+@LEAP = <LEAP>;
+$water_counter = 0;
+for (my $l = 0; $l < scalar @LEAP; $l++){
+     my $LEAProw = $LEAP[$l];
+	my @LEAProw = split (/\s+/, $LEAProw);
+	if ($LEAProw =~ m/WAT/ && $LEAProw =~ m/ATOM/){
+          print "$LEAProw\n";$water_counter = $water_counter+1;
+          }
+    }
+$ligand_waters = $water_counter/3;
+close LEAP;
+open (LEAP, "<"."$fileIDq"."REDUCEDedit.pdb");
+@LEAP = <LEAP>;
+$water_counter = 0;
+for (my $l = 0; $l < scalar @LEAP; $l++){
+     my $LEAProw = $LEAP[$l];
+	my @LEAProw = split (/\s+/, $LEAProw);
+	if ($LEAProw =~ m/WAT/ && $LEAProw =~ m/ATOM/){
+          print "$LEAProw\n";$water_counter = $water_counter+1;
+          }
+    }
+$complex_waters = $water_counter/3;
+close LEAP;
+open (LEAP, "<"."$fileIDr"."REDUCEDedit.pdb");
+@LEAP = <LEAP>;
+$water_counter = 0;
+for (my $l = 0; $l < scalar @LEAP; $l++){
+     my $LEAProw = $LEAP[$l];
+	my @LEAProw = split (/\s+/, $LEAProw);
+	if ($LEAProw =~ m/WAT/ && $LEAProw =~ m/ATOM/){
+          print "$LEAProw\n";$water_counter = $water_counter+1;
+          }
+    }
+$host_waters = $water_counter/3;
+close LEAP;
+
+print "\nnumber of waters in water box...\n";
+print "waterONLY = "."$water_waters\n";
+print "guestONLY = "."$ligand_waters\n";
+print "host + guest complex = "."$complex_waters\n";
+print "hostONLY = "."$host_waters\n";
+$remove_waters1 = $host_waters - $complex_waters;
+sleep(1);
+if ($remove_waters1 >= 0){
+print "\nYou must now remove $remove_waters1"." water molecules from $fileIDr"."REDUCEDedit.pdb\n";
+print "then resave as $fileIDr"."REDUCEDedit.pdb to balance waters in the simululations\n";
+print "IMPORTANT: when open, delete the specified waters from the bottom of the file\n";
+print "IMPORTANT: if balanced properly, the difference should go to zero in the next step\n";
+system("gedit $fileIDr"."REDUCEDedit.pdb\n");
+system "pdb4amber -i ".$fileIDr."REDUCEDedit.pdb -o ".$fileIDr."REDUCEDadjust.pdb \n";
+system "pdb4amber -i ".$fileIDq."REDUCEDedit.pdb -o ".$fileIDq."REDUCEDadjust.pdb \n";
+}
+if ($remove_waters1 < 0){
+print "\nHouston we have a problem...protein+ligand should not have more waters than protein only.\n";
+print "...is ligand missing from file?\n";
+exit;
+}
+
+$remove_waters2 = abs($water_waters - $ligand_waters);
+sleep(1);
+if ($remove_waters2 >= 0){
+print "\nYou must now remove $remove_waters2"." water molecules from $fileIDw"."REDUCEDedit.pdb\n";
+print "then resave as $fileIDw"."REDUCEDedit.pdb to balance waters in the simululations\n";
+print "IMPORTANT: when open, delete the specified waters from the bottom of the file\n";
+print "IMPORTANT: if balanced properly, the difference should go to zero in the next step\n";
+system("gedit $fileIDw"."REDUCEDedit.pdb\n");
+system "pdb4amber -i ".$fileIDw."REDUCEDedit.pdb -o ".$fileIDw."REDUCEDadjust.pdb \n";
+system "pdb4amber -i ".$fileIDl."REDUCEDedit.pdb -o ".$fileIDl."REDUCEDadjust.pdb \n";
+system "pdb4amber -i ".$fileIDl."REDUCEDedit.pdb -o ".$fileIDl."REDUCEDadjust.mol2 \n";
+}
+if ($remove_waters2 < 0){
+print "\nYou must now add $remove_waters2"." water molecules to $fileIDl"."REDUCEDedit.pdb\n";
+print "then resave as $fileIDl"."REDUCEDedit.pdb to balance waters in the simululations\n";
+print "IMPORTANT: CONSIDER ENLARGING THE WATER BOX SIZE AND RERUNNING PREP\n";
+print "IMPORTANT: if balanced properly, the difference should go to zero in the next step\n";
+system("gedit $fileIDl"."REDUCEDedit.pdb\n");
+system "pdb4amber -i ".$fileIDw."REDUCEDedit.pdb -o ".$fileIDw."REDUCEDadjust.pdb \n";
+system "pdb4amber -i ".$fileIDl."REDUCEDedit.pdb -o ".$fileIDl."REDUCEDadjust.pdb \n";
+system "pdb4amber -i ".$fileIDl."REDUCEDedit.pdb -o ".$fileIDl."REDUCEDadjust.mol2 \n";
+}
+sleep(1);
+system "perl teLeap_ligandproteinReferenceBalance.pl\n";
+sleep(1);
+system "perl teLeap_ligandproteinQueryBalance.pl\n";
+
+# check water balance...count waters in 'adjust.pdb' files
+open (LEAP, "<"."$fileIDw"."REDUCEDadjust.pdb");
+@LEAP = <LEAP>;
+$water_counter = 0;
+for (my $l = 0; $l < scalar @LEAP; $l++){
+     my $LEAProw = $LEAP[$l];
+	my @LEAProw = split (/\s+/, $LEAProw);
+	if ($LEAProw =~ m/WAT/ && $LEAProw =~ m/HETATM/){
+          print "$LEAProw\n";$water_counter = $water_counter+1;
+          }
+    }
+$water_waters = $water_counter/3; # each water has 3 atoms
+close LEAP;
+open (LEAP, "<"."$fileIDl"."REDUCEDadjust.pdb");
+@LEAP = <LEAP>;
+$water_counter = 0;
+for (my $l = 0; $l < scalar @LEAP; $l++){
+     my $LEAProw = $LEAP[$l];
+	my @LEAProw = split (/\s+/, $LEAProw);
+	if ($LEAProw =~ m/WAT/ && $LEAProw =~ m/HETATM/){
+          print "$LEAProw\n";$water_counter = $water_counter+1;
+          }
+    }
+$ligand_waters = $water_counter/3;
+close LEAP;
+open (LEAP, "<"."$fileIDq"."REDUCEDadjust.pdb");
+@LEAP = <LEAP>;
+$water_counter = 0;
+for (my $l = 0; $l < scalar @LEAP; $l++){
+     my $LEAProw = $LEAP[$l];
+	my @LEAProw = split (/\s+/, $LEAProw);
+	if ($LEAProw =~ m/WAT/ && $LEAProw =~ m/HETATM/){
+          print "$LEAProw\n";$water_counter = $water_counter+1;
+          }
+    }
+$complex_waters = $water_counter/3;
+close LEAP;
+open (LEAP, "<"."$fileIDr"."REDUCEDadjust.pdb");
+@LEAP = <LEAP>;
+$water_counter = 0;
+for (my $l = 0; $l < scalar @LEAP; $l++){
+     my $LEAProw = $LEAP[$l];
+	my @LEAProw = split (/\s+/, $LEAProw);
+	if ($LEAProw =~ m/WAT/ && $LEAProw =~ m/HETATM/){
+          print "$LEAProw\n";$water_counter = $water_counter+1;
+          }
+    }
+$host_waters = $water_counter/3;
+close LEAP;
+
+print "\nnumber of waters in water box...\n";
+print "waterONLY = "."$water_waters\n";
+print "guestONLY = "."$ligand_waters\n";
+print "host + guest complex = "."$complex_waters\n";
+print "hostONLY = "."$host_waters\n";
+sleep(1);
+$balance_waters = $complex_waters + $water_waters - $host_waters - $ligand_waters;
+print "\n\ntotal difference in number of waters is now...$balance_waters"." waters (it should be zero)\n\n";
+sleep(1);print "IMPORTANT: do NOT proceed unless waters are balanced in the simulations\n";
+print "(i.e. delete waters to satisfy complex+waterOnly = hostOnly+guestOnly)\n";
+print "(see https://ambermd.org/tutorials/advanced/tutorial21/index.php)\n\n";
+print "(use all-atom preset in UCSF Chimera to view solvated systems)\n\n";
+# open files
+system("$chimera_path"."chimera $fileIDr"."REDUCEDadjust.pdb\n");
+system("$chimera_path"."chimera $fileIDq"."REDUCEDadjust.pdb\n");
+system("$chimera_path"."chimera $fileIDl"."REDUCEDadjust.pdb\n");
+system("$chimera_path"."chimera $fileIDw"."REDUCEDadjust.pdb\n");
+
+# check file sizes afterwards for catastrophic failure
 my $filecheck1 = "vac_".$fileIDq."REDUCED.prmtop";
 my $filecheck3 = "vac_".$fileIDr."REDUCED.prmtop";
 my $filecheck2 = "wat_".$fileIDq."REDUCED.inpcrd";
@@ -632,77 +801,7 @@ print "combined file size for hostOnly+guestOnly = $checksize2\n\n";
 sleep(1);print "IMPORTANT: make sure the waters are balanced in simulations\n";
 print "(i.e. delete waters to satisfy complex+waterOnly = hostOnly+guestOnly)\n";
 print "(see https://ambermd.org/tutorials/advanced/tutorial21/index.php)\n\n";
-# check number waters added
-open (LEAP, "<"."leap.log");
-@LEAP = <LEAP>;
-$name_counter = 0;
-$host_waters = 0;
-$complex_waters = 0;
-for (my $l = 0; $l < scalar @LEAP; $l++){
-     my $LEAProw = $LEAP[$l];
-	my @LEAProw = split (/\s+/, $LEAProw);
-	my $header = $LEAProw[1];
-     my $waters = $LEAProw[2];
-     if ($LEAProw =~ m/Added/ && $LEAProw =~ m/residues/){
-          #print "$LEAProw\n";
-          if ($name_counter == 0){$ligand_waters = $waters;}
-          if ($name_counter == 1){$complex_waters = $waters;}
-          if ($name_counter == 2){$host_waters = $waters;}
-          $name_counter = $name_counter+1;
-          }
-    }
-close LEAP;
-print "\nnumber of waters added to water box...\n";
-print "waterONLY = "."$ligand_waters\n";
-print "guestONLY = "."$ligand_waters\n";
-print "host + guest complex = "."$complex_waters\n";
-print "hostONLY = "."$host_waters\n";
-$remove_waters = $host_waters - $complex_waters;
-sleep(1);
-if ($remove_waters >= 0){
-print "\nYou must now remove $remove_waters"." water molecules from $fileIDr"."REDUCEDedit.pdb\n";
-print "then resave as $fileIDr"."REDUCEDedit.pdb to balance waters in the simululations\n";
-print "IMPORTANT: when open, delete the specified waters from the bottom of the file\n";
-print "IMPORTANT: if balanced properly, the difference should go to zero in the next step\n";
-system("gedit $fileIDr"."REDUCEDedit.pdb\n");
-system "pdb4amber -i ".$fileIDr."REDUCEDedit.pdb -o ".$fileIDr."REDUCEDadjust.pdb \n";
-}
-if ($remove_waters < 0){
-print "Houston...we have a problem (there should never be more waters added to complex than to the host. Perhaps a ligand is missing somewhere?)\n";
-exit;
-}
-sleep(1);
-system "perl teLeap_ligandproteinBalance.pl\n";
-# check water balance
-open (LEAP, "<"."leap.log");
-@LEAP = <LEAP>;
-$name_counter = 0;
-$host_waters = 0;
-$complex_waters = 0;
-for (my $l = 0; $l < scalar @LEAP; $l++){
-     my $LEAProw = $LEAP[$l];
-	my @LEAProw = split (/\s+/, $LEAProw);
-	my $header = $LEAProw[1];
-     my $waters = $LEAProw[2];
-     if ($LEAProw =~ m/WAT/ && $LEAProw !~ m/>>/){    
-          #print "$LEAProw\n";
-          if ($name_counter == 3){$host_waters = $waters;}
-          if ($name_counter == 1){$complex_waters = $waters;}
-          $name_counter = $name_counter+1;
-          }
-    }
-close LEAP;
-$remove_waters = $host_waters - $complex_waters;
-print "\n\ndifference in number of waters is now...$remove_waters"." waters (it should be zero)\n\n";
-sleep(1);print "IMPORTANT: do NOT proceed unless waters are balanced in the simulations\n";
-print "(i.e. delete waters to satisfy complex+waterOnly = hostOnly+guestOnly)\n";
-print "(see https://ambermd.org/tutorials/advanced/tutorial21/index.php)\n\n";
-print "(use all-atom preset in UCSF Chimera to view solvated systems)\n\n";
-# open files
-system("$chimera_path"."chimera $fileIDr"."REDUCEDedit.pdb\n");
-system("$chimera_path"."chimera $fileIDq"."REDUCEDedit.pdb\n");
-system("$chimera_path"."chimera $fileIDl"."REDUCEDedit.pdb\n");
-system("$chimera_path"."chimera $fileIDw"."REDUCEDedit.pdb\n");
+
 }
 
 ######################################################################################################
@@ -773,7 +872,7 @@ sub launch { # launch MD run
 if($simType eq "amber"){
     system "perl MD_proteinQuery.pl\n";
     sleep(2);
-    system "perl MD_proteinReference_adjust.pl\n";
+    system "perl MD_proteinReference.pl\n";
     sleep(2);
     system "perl MD_proteinLigand.pl\n";
     sleep(2);
@@ -788,8 +887,6 @@ if($simType eq "amber"){
 if($simType eq "open" && $solvType eq "ex"){
     system "conda config --set auto_activate_base true\n";
     system "x-terminal-emulator\n";
-    print "\nresave wat_$fileIDr"."REDUCEDadjust.prmtop as wat_$fileIDr"."REDUCED.prmtop\n";
-    print "resave wat_$fileIDr"."REDUCEDadjust.inpcrd as wat_$fileIDr"."REDUCED.inpcrd\n";
     print "\nRUN THE FOLLOWING SCRIPTS SEQUENTIALLY IN THE NEW TERMINAL\n";
     print "python MD_proteinQuery_openMM.py\n";
     print "python MD_proteinReference_openMM.py\n";
