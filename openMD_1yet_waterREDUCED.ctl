@@ -1,0 +1,3 @@
+amber
+wat_1yet_waterREDUCED.prmtop
+eq_1yet_waterREDUCED.nc

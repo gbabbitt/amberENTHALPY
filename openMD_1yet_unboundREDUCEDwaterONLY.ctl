@@ -1,0 +1,3 @@
+amber
+wat_1yet_unboundREDUCEDwaterONLY.prmtop
+eq_1yet_unboundREDUCEDwaterONLY.nc
