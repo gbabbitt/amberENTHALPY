@@ -131,8 +131,8 @@ open(LEAP_LIGAND, ">"."$ligand_label.bat") or die "could not open LEAP file\n";
      print LEAP_LIGAND "loadamberparams $ligand_label".".frcmod\n";
      print LEAP_LIGAND "saveoff ligand$ligand_label ligand.lib\n";
      print LEAP_LIGAND "saveamberparm ligand$ligand_label vac_$ligand_label.prmtop vac_$ligand_label.inpcrd\n";
-     #print LEAP_LIGAND "addions ligand$ligand_label Na+ 0\n"; # only use to charge or neutralize explicit solvent
-	#print LEAP_LIGAND "addions ligand$ligand_label Cl- 0\n"; # only use to charge or neutralize explicit solvent
+     print LEAP_LIGAND "addions ligand$ligand_label Na+ 0\n"; # only use to charge or neutralize explicit solvent
+	print LEAP_LIGAND "addions ligand$ligand_label Cl- 0\n"; # only use to charge or neutralize explicit solvent
      #print LEAP_LIGAND "saveamberparm ligand$ligand_label ion_$ligand_label.prmtop ion_$ligand_label.inpcrd\n";
 	print LEAP_LIGAND "solvateBox ligand$ligand_label TIP3PBOX {$Box_Size $Box_Size $Box_Size}\n";
      #print LEAP_LIGAND "solvateoct ligand$ligand_label TIP3PBOX $Box_Size\n";
