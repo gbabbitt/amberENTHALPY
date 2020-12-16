@@ -28,7 +28,7 @@ my $fileIDl = '1yet_ligand';
 my $fileIDw = 'singleWater';
 my $forceID = 'leaprc.protein.ff14SB';
 my $dforceID = 'leaprc.gaff2';
-my $runsID = '10';
+my $runsID = 10;
 my $implicit=0;
 my $explicit=0;
 my $solvType = 'ex';
@@ -1112,7 +1112,7 @@ $seENTHALPY = $sdENTHALPY/sqrt($nENTHALPY);
 # round to 0.001
 $meanENTHALPY = sprintf("%.3f", $meanENTHALPY);
 $seENTHALPY = sprintf("%.3f", $seENTHALPY);
-$timetot = $cutoffValueProd*$runsID;
+$timetot = $cutoffValueProdFS*$runsID/1000000;
 
 # image and movie rendering
 print "TO RECORD MOVIE:\n";
