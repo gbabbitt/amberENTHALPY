@@ -14,6 +14,10 @@ Binding enthalpy describes the difference in heat due to the formation of the pr
 
 https://www2.chemistry.msu.edu/faculty/reusch/virttxtjml/energy1.htm
 
+This computer simulation approach is intended to mimic the results obtained through Isothermal Titration Calorimetry.  For more information on this procedure
+
+https://www.jove.com/t/2796/isothermal-titration-calorimetry-for-measuring-macromolecule-ligand
+
 IMPORTANT NOTE: this script will walk the user through tLeAP so as to balance the waters in the 4 simulations. It is important not to proceed with simulation unless the difference in waters = zero after running tLeAP. The number of water molecules in the system are balanced such that 
 
 protein-ligand COMPLEX + water ONLY = protein ONLY + ligand only
