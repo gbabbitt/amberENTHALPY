@@ -354,7 +354,7 @@ sleep(2);
 	# convert all times to femtosec
 	$cutoffValueHeatFS = $cutoffValueHeat*1000;
 	$cutoffValueEqFS = $cutoffValueEq*1000000;
-	$cutoffValueProdFS = $cutoffValueProd*1000;
+	$cutoffValueProdFS = $cutoffValueProd*1000000;
 
    
 ### make query protein control file ###
