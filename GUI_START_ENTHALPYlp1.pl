@@ -174,7 +174,7 @@ my $pdbFrame = $mw->Frame();
 					-textvariable=>\$chainN
 					);
      my $boxFrame = $pdbFrame->Frame();
-		my $boxLabel = $boxFrame->Label(-text=>"size of water octahedral box (e.g. 30 angstom buffer): ");
+		my $boxLabel = $boxFrame->Label(-text=>"size of water octahedral box (e.g. 40 angstom buffer): ");
 		my $boxEntry = $boxFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$octBox
