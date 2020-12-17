@@ -29,7 +29,7 @@ for (my $c = 0; $c <= scalar @IN; $c++){
     $header = $INrow[0];
     $value = $INrow[1];
     print "$header\t"."$value\n";
-    if ($header eq "PDB_ID") { $PDB_ID = $value;}
+    if ($header eq "PDB_ID") { $PDB_IDref = $value;}
     if ($header eq "Force_Field") { $Force_Field = $value;}
     if ($header eq "LIGAND_Field") { $LIGAND_Field = $value;}
     if ($header eq "Box_Size") { $Box_Size = $value;}
@@ -41,10 +41,23 @@ for (my $c = 0; $c <= scalar @IN; $c++){
 
 }
 
+open(IN, "<"."MDq.ctl") or die "could not find MD.ctl control file\n";
+@IN = <IN>;
+for (my $c = 0; $c <= scalar @IN; $c++){
+    $INrow = $IN[$c];
+    @INrow = split (/\s+/, $INrow);
+    $header = $INrow[0];
+    $value = $INrow[1];
+    print "$header\t"."$value\n";
+    if ($header eq "PDB_ID") { $PDB_IDquery = $value;}
+    
+}
+close IN;
+
 
 #my $protein_label = $ARGV[0];
-my $protein_label = $PDB_ID;
-
+my $protein_labelR = $PDB_IDref;
+my $protein_labelQ = $PDB_IDquery;
 my $method = $Solvation_Method; # "explicit" or "implicit"
 my $prmtop;
 my $igb;
@@ -80,19 +93,42 @@ if (-e "$protein_label.pdb") { print "$protein_label.pdb found\n"; }
 
 # PDBs further reduced manually by deleting heteroatoms
 =cut
+
+####################################################################
+# find bound protein (complex) water box size
+####################################################################
+open(IN, "<"."wat_$protein_labelQ.inpcrd") or die "could not open input coordinate file\n";
+@IN = <IN>;
+for (my $a = 0; $a < scalar @IN; $a++){  # catches values from last line of .inpcrd file
+    $INrow = $IN[$a];
+    @INrow = split (/\s+/, $INrow);
+    $Xval = $INrow[1];
+    $Yval = $INrow[2];
+    $Zval = $INrow[3];
+    if ($Xval != '') {$Xsize = $Xval;};
+    if ($Yval != '') {$Ysize = $Yval;};
+    if ($Zval != '') {$Zsize = $Zval;};
+    print "$Xval\t"."$Yval\t"."$Zval\n";
+}
+print "protein-ligand complex water box size\n";
+print "$Xsize\t"."$Ysize\t"."$Zsize\n";
+sleep(1);
+close IN;
+
 ####################################################################
 # Protein: Prepare the input file for tleap 
 #################################################################
 
-open(LEAP_PROTEIN, ">"."$protein_label"."adjust.bat") or die "could not open LEAP file\n";
+open(LEAP_PROTEIN, ">"."$protein_labelR"."adjust.bat") or die "could not open LEAP file\n";
 	print LEAP_PROTEIN "source "."$teleap_path"."$proteinfield\n";
      print LEAP_PROTEIN "source "."$teleap_path"."$ligandfield\n";
 	print LEAP_PROTEIN "source "."$teleap_path"."leaprc.water.tip3p\n";
-     print LEAP_PROTEIN "protein$protein_label = loadpdb $protein_label"."adjust.pdb\n";
-     print LEAP_PROTEIN "addions protein$protein_label Na+ 0\n"; # to charge or neutralize explicit solvent
-     print LEAP_PROTEIN "addions protein$protein_label Cl- 0\n"; # to charge or neutralize explicit solvent
-	print LEAP_PROTEIN "setBox protein$protein_label vdw {$Box_Size $Box_Size $Box_Size}\n";
-     print LEAP_PROTEIN "saveamberparm protein$protein_label wat"."_$protein_label.prmtop wat"."_$protein_label.inpcrd\n";
+     print LEAP_PROTEIN "protein$protein_labelR = loadpdb $protein_labelR"."adjust.pdb\n";
+     print LEAP_PROTEIN "addions protein$protein_labelR Na+ 0\n"; # to charge or neutralize explicit solvent
+     print LEAP_PROTEIN "addions protein$protein_labelR Cl- 0\n"; # to charge or neutralize explicit solvent
+	print LEAP_PROTEIN "set protein$protein_labelR box {$Xsize $Ysize $Zsize}\n";
+     #print LEAP_PROTEIN "setBox protein$protein_label vdw {$Box_Size $Box_Size $Box_Size}\n";
+     print LEAP_PROTEIN "saveamberparm protein$protein_labelR wat"."_$protein_labelR.prmtop wat"."_$protein_labelR.inpcrd\n";
      print LEAP_PROTEIN "quit\n";
 close LEAP_PROTEIN;
 
@@ -105,12 +141,12 @@ print "  default is simple rigid 3 point model, charge neutralized with Na+\n";
 print "  close .bat when done\n\n";
 sleep(2);
 
-system "gedit $protein_label"."adjust.bat\n";
+system "gedit $protein_labelR"."adjust.bat\n";
 
 ######################################################################################
 # Run sequence through tleap: prepare topology (prmtop) and coordinate (inpcrd) files
 ######################################################################################
-open(TLEAP_PROTEIN, '|-', "tleap -f $protein_label"."adjust.bat");
+open(TLEAP_PROTEIN, '|-', "tleap -f $protein_labelR"."adjust.bat");
 	print<TLEAP_PROTEIN>;
 close TLEAP_PROTEIN;
 
@@ -119,6 +155,6 @@ sleep(1);
 
 ######################################################################
 
-print "teLeap on Query structure is complete\n\n";
+print "teLeap on Reference structure is complete\n\n";
 
 exit;

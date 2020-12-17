@@ -101,7 +101,7 @@ if (-e "$protein_label.pdb") { print "$protein_label.pdb found\n"; }
 =cut
 
 ####################################################################
-# Ligand: Prepare the input file for tleap 
+# Water: Prepare the input file for tleap 
 ####################################################################
 
 

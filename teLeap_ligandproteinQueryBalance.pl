@@ -89,7 +89,7 @@ my $len_eq = $Equilibration_Time; # Length of equilibration run in fs
 my $len_heat = $Heating_Time; # Length of heat run in fs
 my $forcefield = $Force_Field; # specify AMBER forcefield
 my $ligandfield = $LIGAND_Field; # specify AMBER DNA forcefield
-my $Large_Box_Size = 1.15*$Box_Size;
+#my $Large_Box_Size = 1.15*$Box_Size;
 =pod
 
 if (-e "$protein_label.pdb") { print "$protein_label.pdb found\n"; }
@@ -100,14 +100,36 @@ if (-e "$protein_label.pdb") { print "$protein_label.pdb found\n"; }
 =cut
 
 ####################################################################
-# Ligand: Prepare the input file for tleap 
+# find ligand water box size
+####################################################################
+open(IN, "<"."wat_$ligand_label.inpcrd") or die "could not open input coordinate file\n";
+@IN = <IN>;
+for (my $a = 0; $a < scalar @IN; $a++){ # catches values from last line of .inpcrd file
+    $INrow = $IN[$a];
+    @INrow = split (/\s+/, $INrow);
+    $Xval = $INrow[1];
+    $Yval = $INrow[2];
+    $Zval = $INrow[3];
+    if ($Xval != '') {$Xsize = $Xval;};
+    if ($Yval != '') {$Ysize = $Yval;};
+    if ($Zval != '') {$Zsize = $Zval;};
+    print "$Xval\t"."$Yval\t"."$Zval\n";
+}
+print "ligand water box size\n";
+print "$Xsize\t"."$Ysize\t"."$Zsize\n";
+sleep(1);
+close IN;
+
+####################################################################
+# Water: Prepare the input file for tleap 
 ####################################################################
 
 open(LEAP_WATER, ">"."$water_label.bat") or die "could not open LEAP file\n";
 	print LEAP_WATER "source "."$teleap_path"."leaprc.water.tip3p\n";
      print LEAP_WATER "water$water_label = loadpdb $water_label"."adjust.pdb\n";
      print LEAP_WATER "check water$water_label\n";
-     print LEAP_WATER "setBox water$water_label vdw {$Large_Box_Size $Large_Box_Size $Large_Box_Size}\n";
+     print LEAP_WATER "set water$water_label box {$Xsize $Ysize $Zsize}\n";
+     #print LEAP_WATER "setBox water$water_label vdw {$Large_Box_Size $Large_Box_Size $Large_Box_Size}\n";
      print LEAP_WATER "saveamberparm water$water_label wat"."_$water_label.prmtop wat"."_$water_label.inpcrd\n";
      print LEAP_WATER "quit\n";
 close LEAP_WATER;

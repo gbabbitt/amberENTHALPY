@@ -40,7 +40,7 @@ my $cutoffValueSalt=0.0;
 my $cutoffValueHeatFS=0;
 my $cutoffValueEqFS=0;
 my $cutoffValueProdFS=0;
-my $octBox = 40;
+my $octBox = 20;
 my @fullfile;
 my @chainlen;
 my @fullfile2;
@@ -174,7 +174,7 @@ my $pdbFrame = $mw->Frame();
 					-textvariable=>\$chainN
 					);
      my $boxFrame = $pdbFrame->Frame();
-		my $boxLabel = $boxFrame->Label(-text=>"size of water octahedral box (e.g. 40 angstom buffer): ");
+		my $boxLabel = $boxFrame->Label(-text=>"size of water octahedral box (e.g. 20 angstom buffer): ");
 		my $boxEntry = $boxFrame->Entry(-borderwidth => 2,
 					-relief => "groove",
 					-textvariable=>\$octBox

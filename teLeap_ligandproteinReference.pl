@@ -123,6 +123,6 @@ sleep(1);
 
 ######################################################################
 
-print "teLeap on Query structure is complete\n\n";
+print "teLeap on Reference structure is complete\n\n";
 
 exit;
