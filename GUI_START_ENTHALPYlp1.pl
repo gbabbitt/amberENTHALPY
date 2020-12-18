@@ -679,7 +679,7 @@ print "...is ligand missing from file?\n";
 exit;
 }
 
-$remove_waters2 = abs($water_waters - $ligand_waters);
+$remove_waters2 = $water_waters - $ligand_waters;
 sleep(1);
 if ($remove_waters2 >= 0){
 print "\nYou must now remove $remove_waters2"." water molecules from $fileIDw"."REDUCEDedit.pdb\n";
@@ -1069,10 +1069,10 @@ for (my $k = 0; $k < scalar @IN1; $k++){
 $statSCORE = new Statistics::Descriptive::Full; # residue avg flux - reference
 $statSCORE->add_data (@enthalpies);
 $meanENTHALPY = $statSCORE->mean();
-$meanENTHALPY = $meanENTHALPY/1000;
+$meanENTHALPY = $meanENTHALPY;
 $nENTHALPY = $statSCORE->count();
 $sdENTHALPY = $statSCORE->standard_deviation();
-$sdENTHALPY = $sdENTHALPY/1000;
+$sdENTHALPY = $sdENTHALPY;
 $seENTHALPY = $sdENTHALPY/sqrt($nENTHALPY);
 # round to 0.001
 $meanENTHALPY = sprintf("%.3f", $meanENTHALPY);

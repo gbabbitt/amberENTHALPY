@@ -128,6 +128,8 @@ open(LEAP_WATER, ">"."$water_label.bat") or die "could not open LEAP file\n";
 	print LEAP_WATER "source "."$teleap_path"."leaprc.water.tip3p\n";
      print LEAP_WATER "water$water_label = loadpdb $water_label"."adjust.pdb\n";
      print LEAP_WATER "check water$water_label\n";
+     print LEAP_WATER "addions water$water_label Na+ 0\n"; # to charge or neutralize explicit solvent
+     print LEAP_WATER "addions water$water_label Cl- 0\n"; # to charge or neutralize explicit solvent
      print LEAP_WATER "set water$water_label box {$Xsize $Ysize $Zsize}\n";
      #print LEAP_WATER "setBox water$water_label vdw {$Large_Box_Size $Large_Box_Size $Large_Box_Size}\n";
      print LEAP_WATER "saveamberparm water$water_label wat"."_$water_label.prmtop wat"."_$water_label.inpcrd\n";
