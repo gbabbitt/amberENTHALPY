@@ -32,7 +32,10 @@ for (my $c = 0; $c <= scalar @IN; $c++){
     if ($header eq "PDB_ID") { $PDB_IDref = $value;}
     if ($header eq "Force_Field") { $Force_Field = $value;}
     if ($header eq "LIGAND_Field") { $LIGAND_Field = $value;}
-    if ($header eq "Box_Size") { $Box_Size = $value;}
+    if ($header eq "Box_Size_Complex") { $Box_Size_Complex = $value;}
+    if ($header eq "Box_Size_Host") { $Box_Size_Host = $value;}
+    if ($header eq "Box_Size_Guest") { $Box_Size_Guest = $value;}
+    if ($header eq "Box_Size_Water") { $Box_Size_Water = $value;}
     if ($header eq "Number_Runs") { $Number_Runs = $value;}
     if ($header eq "Heating_Time") { $Heating_Time = $value;}
     if ($header eq "Equilibration_Time") { $Equilibration_Time = $value;}
@@ -95,9 +98,9 @@ if (-e "$protein_label.pdb") { print "$protein_label.pdb found\n"; }
 =cut
 
 ####################################################################
-# find bound protein (complex) water box size
+# find bound protein (host) water box size
 ####################################################################
-open(IN, "<"."wat_$protein_labelQ.inpcrd") or die "could not open input coordinate file\n";
+open(IN, "<"."watUNADJUST_$protein_labelR.inpcrd") or die "could not open input coordinate file\n";
 @IN = <IN>;
 for (my $a = 0; $a < scalar @IN; $a++){  # catches values from last line of .inpcrd file
     $INrow = $IN[$a];
@@ -110,7 +113,7 @@ for (my $a = 0; $a < scalar @IN; $a++){  # catches values from last line of .inp
     if ($Zval != '') {$Zsize = $Zval;};
     print "$Xval\t"."$Yval\t"."$Zval\n";
 }
-print "protein-ligand complex water box size\n";
+print "protein host water box size\n";
 print "$Xsize\t"."$Ysize\t"."$Zsize\n";
 sleep(1);
 close IN;
@@ -127,8 +130,8 @@ open(LEAP_PROTEIN, ">"."$protein_labelR"."adjust.bat") or die "could not open LE
      print LEAP_PROTEIN "addions protein$protein_labelR Na+ 0\n"; # to charge or neutralize explicit solvent
      print LEAP_PROTEIN "addions protein$protein_labelR Cl- 0\n"; # to charge or neutralize explicit solvent
 	print LEAP_PROTEIN "set protein$protein_labelR box {$Xsize $Ysize $Zsize}\n";
-     #print LEAP_PROTEIN "setBox protein$protein_label vdw {$Box_Size $Box_Size $Box_Size}\n";
      print LEAP_PROTEIN "saveamberparm protein$protein_labelR wat"."_$protein_labelR.prmtop wat"."_$protein_labelR.inpcrd\n";
+     print LEAP_PROTEIN "savepdb protein$protein_labelR "."$protein_labelR"."final.pdb\n";
      print LEAP_PROTEIN "quit\n";
 close LEAP_PROTEIN;
 

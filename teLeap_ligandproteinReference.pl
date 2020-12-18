@@ -32,7 +32,10 @@ for (my $c = 0; $c <= scalar @IN; $c++){
     if ($header eq "PDB_ID") { $PDB_ID = $value;}
     if ($header eq "Force_Field") { $Force_Field = $value;}
     if ($header eq "LIGAND_Field") { $LIGAND_Field = $value;}
-    if ($header eq "Box_Size") { $Box_Size = $value;}
+    if ($header eq "Box_Size_Complex") { $Box_Size_Complex = $value;}
+    if ($header eq "Box_Size_Host") { $Box_Size_Host = $value;}
+    if ($header eq "Box_Size_Guest") { $Box_Size_Guest = $value;}
+    if ($header eq "Box_Size_Water") { $Box_Size_Water = $value;}
     if ($header eq "Number_Runs") { $Number_Runs = $value;}
     if ($header eq "Heating_Time") { $Heating_Time = $value;}
     if ($header eq "Equilibration_Time") { $Equilibration_Time = $value;}
@@ -93,9 +96,9 @@ open(LEAP_PROTEIN, ">"."$protein_label.bat") or die "could not open LEAP file\n"
 	print LEAP_PROTEIN "addions protein$protein_label Na+ 0\n"; # to charge or neutralize explicit solvent
      print LEAP_PROTEIN "addions protein$protein_label Cl- 0\n"; # to charge or neutralize explicit solvent
 	print LEAP_PROTEIN "saveamberparm protein$protein_label ion_$protein_label.prmtop ion_$protein_label.inpcrd\n";
-	print LEAP_PROTEIN "solvateBox protein$protein_label TIP3PBOX {$Box_Size $Box_Size $Box_Size}\n";
+	print LEAP_PROTEIN "solvateBox protein$protein_label TIP3PBOX {$Box_Size_Host $Box_Size_Host $Box_Size_Host}\n";
      #print LEAP_PROTEIN "solvateoct protein$protein_label TIP3PBOX $Box_Size\n";
-     #print LEAP_PROTEIN "saveamberparm protein$protein_label wat"."_$protein_label.prmtop wat"."_$protein_label.inpcrd\n";
+     print LEAP_PROTEIN "saveamberparm protein$protein_label watUNADJUST"."_$protein_label.prmtop watUNADJUST"."_$protein_label.inpcrd\n";
      print LEAP_PROTEIN "savepdb protein$protein_label $protein_label"."edit.pdb\n";
 	print LEAP_PROTEIN "quit\n";
 close LEAP_PROTEIN;

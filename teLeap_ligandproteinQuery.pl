@@ -35,7 +35,10 @@ for (my $c = 0; $c <= scalar @IN; $c++){
     if ($header eq "WATER_ID") { $WATER_ID = $value;}
     if ($header eq "Force_Field") { $Force_Field = $value;}
     if ($header eq "LIGAND_Field") { $LIGAND_Field = $value;}
-    if ($header eq "Box_Size") { $Box_Size = $value;}
+    if ($header eq "Box_Size_Complex") { $Box_Size_Complex = $value;}
+    if ($header eq "Box_Size_Host") { $Box_Size_Host = $value;}
+    if ($header eq "Box_Size_Guest") { $Box_Size_Guest = $value;}
+    if ($header eq "Box_Size_Water") { $Box_Size_Water = $value;}
     if ($header eq "Number_Runs") { $Number_Runs = $value;}
     if ($header eq "Heating_Time") { $Heating_Time = $value;}
     if ($header eq "Equilibration_Time") { $Equilibration_Time = $value;}
@@ -89,8 +92,7 @@ my $len_eq = $Equilibration_Time; # Length of equilibration run in fs
 my $len_heat = $Heating_Time; # Length of heat run in fs
 my $forcefield = $Force_Field; # specify AMBER forcefield
 my $ligandfield = $LIGAND_Field; # specify AMBER DNA forcefield
-# define larger box for water only
-my $Large_Box_Size = 1.15*$Box_Size;
+
 =pod
 
 if (-e "$protein_label.pdb") { print "$protein_label.pdb found\n"; }
@@ -110,8 +112,8 @@ open(LEAP_WATER, ">"."$water_label.bat") or die "could not open LEAP file\n";
      print LEAP_WATER "water$water_label = loadpdb $water_label.pdb\n";
      print LEAP_WATER "check water$water_label\n";
      #print LEAP_WATER "solvateoct water$water_label TIP3PBOX $Box_Size\n";
-     print LEAP_WATER "solvateBox water$water_label TIP3PBOX {$Large_Box_Size $Large_Box_Size $Large_Box_Size}\n";
-     #print LEAP_WATER "saveamberparm water$water_label wat"."_$water_label.prmtop wat"."_$water_label.inpcrd\n";
+     print LEAP_WATER "solvateBox water$water_label TIP3PBOX {$Box_Size_Water $Box_Size_Water $Box_Size_Water}\n";
+     print LEAP_WATER "saveamberparm water$water_label watUNADJUST"."_$water_label.prmtop watUNADJUST"."_$water_label.inpcrd\n";
      print LEAP_WATER "savepdb water$water_label "."$water_label"."edit.pdb\n";
      print LEAP_WATER "quit\n";
 close LEAP_WATER;
@@ -133,11 +135,13 @@ open(LEAP_LIGAND, ">"."$ligand_label.bat") or die "could not open LEAP file\n";
      print LEAP_LIGAND "saveamberparm ligand$ligand_label vac_$ligand_label.prmtop vac_$ligand_label.inpcrd\n";
      print LEAP_LIGAND "addions ligand$ligand_label Na+ 0\n"; # only use to charge or neutralize explicit solvent
 	print LEAP_LIGAND "addions ligand$ligand_label Cl- 0\n"; # only use to charge or neutralize explicit solvent
-     #print LEAP_LIGAND "saveamberparm ligand$ligand_label ion_$ligand_label.prmtop ion_$ligand_label.inpcrd\n";
-	print LEAP_LIGAND "solvateBox ligand$ligand_label TIP3PBOX {$Box_Size $Box_Size $Box_Size}\n";
+     print LEAP_LIGAND "saveamberparm ligand$ligand_label ion_$ligand_label.prmtop ion_$ligand_label.inpcrd\n";
+	print LEAP_LIGAND "solvateBox ligand$ligand_label TIP3PBOX {$Box_Size_Guest $Box_Size_Guest $Box_Size_Guest}\n";
      #print LEAP_LIGAND "solvateoct ligand$ligand_label TIP3PBOX $Box_Size\n";
 	print LEAP_LIGAND "saveamberparm ligand$ligand_label wat"."_$ligand_label.prmtop wat"."_$ligand_label.inpcrd\n";
      print LEAP_LIGAND "savepdb ligand$ligand_label "."$ligand_label"."edit.pdb\n";
+     print LEAP_LIGAND "savepdb ligand$ligand_label "."$ligand_label"."adjust.pdb\n";
+     print LEAP_LIGAND "savepdb ligand$ligand_label "."$ligand_label"."final.pdb\n";
      print LEAP_LIGAND "quit\n";
 close LEAP_LIGAND;
 
@@ -162,9 +166,11 @@ open(LEAP_COMPLEX, ">"."$protein_labelQ.bat") or die "could not open LEAP file\n
 	print LEAP_COMPLEX "addions complex$protein_labelQ Cl- 0\n"; # to charge or neutralize explicit solvent
 	print LEAP_COMPLEX "saveamberparm complex$protein_labelQ ion_$protein_labelQ.prmtop ion_$protein_labelQ.inpcrd\n";
 	#print LEAP_COMPLEX "solvateoct complex$protein_labelQ TIP3PBOX $Box_Size\n";
-	print LEAP_COMPLEX "solvateBox complex$protein_labelQ TIP3PBOX {$Box_Size $Box_Size $Box_Size}\n";
+	print LEAP_COMPLEX "solvateBox complex$protein_labelQ TIP3PBOX {$Box_Size_Complex $Box_Size_Complex $Box_Size_Complex}\n";
      print LEAP_COMPLEX "saveamberparm complex$protein_labelQ wat"."_$protein_labelQ.prmtop wat"."_$protein_labelQ.inpcrd\n";
      print LEAP_COMPLEX "savepdb complex$protein_labelQ $protein_labelQ"."edit.pdb\n";
+     print LEAP_COMPLEX "savepdb complex$protein_labelQ $protein_labelQ"."adjust.pdb\n";
+     print LEAP_COMPLEX "savepdb complex$protein_labelQ $protein_labelQ"."final.pdb\n";
      print LEAP_COMPLEX "quit\n";
 close LEAP_COMPLEX;
 
@@ -180,7 +186,6 @@ sleep(2);
 
 system "gedit $water_label.bat\n";
 system "gedit $ligand_label.bat\n";
-#system "gedit $protein_labelR.bat\n";
 system "gedit $protein_labelQ.bat\n";
 
 ######################################################################################
@@ -196,11 +201,6 @@ sleep(1);
 open(TLEAP_LIGAND, '|-', "tleap -f $ligand_label.bat");
 	print<TLEAP_LIGAND>;
 close TLEAP_LIGAND;
-#print "  running protein input file for teLeap\n\n";
-#sleep(1);
-#open(TLEAP_PROTEIN, '|-', "tleap -f $protein_labelR.bat");
-#	print<TLEAP_PROTEIN>;
-#close TLEAP_PROTEIN;
 print "  running protein-ligand input file for teLeap\n\n";
 sleep(1);
 open(TLEAP_COMPLEX, '|-', "tleap -f $protein_labelQ.bat");

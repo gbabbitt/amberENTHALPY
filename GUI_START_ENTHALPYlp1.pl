@@ -40,7 +40,10 @@ my $cutoffValueSalt=0.0;
 my $cutoffValueHeatFS=0;
 my $cutoffValueEqFS=0;
 my $cutoffValueProdFS=0;
-my $octBox = 30;
+my $solvBoxCOMPLEX = 30;
+my $solvBoxHOST = 30;
+my $solvBoxGUEST = 30;
+my $solvBoxWATER = 35;
 my @fullfile;
 my @chainlen;
 my @fullfile2;
@@ -173,12 +176,30 @@ my $pdbFrame = $mw->Frame();
 					-relief => "groove",
 					-textvariable=>\$chainN
 					);
-     my $boxFrame = $pdbFrame->Frame();
-		my $boxLabel = $boxFrame->Label(-text=>"size of water octahedral box (i.e. angstom buffer): ");
-		my $boxEntry = $boxFrame->Entry(-borderwidth => 2,
+     my $boxFrame1 = $pdbFrame->Frame();
+		my $boxLabel1 = $boxFrame1->Label(-text=>"size of COMPLEX water box (i.e. angstom buffer): ");
+		my $boxEntry1 = $boxFrame1->Entry(-borderwidth => 2,
 					-relief => "groove",
-					-textvariable=>\$octBox
-					);    
+					-textvariable=>\$solvBoxCOMPLEX
+					);
+      my $boxFrame2 = $pdbFrame->Frame();
+		my $boxLabel2 = $boxFrame2->Label(-text=>"size of HOST water box (i.e. angstom buffer): ");
+		my $boxEntry2 = $boxFrame2->Entry(-borderwidth => 2,
+					-relief => "groove",
+					-textvariable=>\$solvBoxHOST
+					);
+     my $boxFrame3 = $pdbFrame->Frame();
+		my $boxLabel3 = $boxFrame3->Label(-text=>"size of GUEST water box (i.e. angstom buffer): ");
+		my $boxEntry3 = $boxFrame3->Entry(-borderwidth => 2,
+					-relief => "groove",
+					-textvariable=>\$solvBoxGUEST
+					);
+      my $boxFrame4 = $pdbFrame->Frame();
+		my $boxLabel4 = $boxFrame4->Label(-text=>"size of EMPTY water box (i.e. angstom buffer): ");
+		my $boxEntry4 = $boxFrame4->Entry(-borderwidth => 2,
+					-relief => "groove",
+					-textvariable=>\$solvBoxWATER
+					);      
 	my $startFrame = $pdbFrame->Frame();
 		my $startLabel = $startFrame->Label(-text=>"start numbering AA's on chain at (e.g. 1): ");
 		my $startEntry = $startFrame->Entry(-borderwidth => 2,
@@ -289,8 +310,14 @@ $runsLabel->pack(-side=>"left");
 $runsEntry->pack(-side=>"left");
 $chainLabel->pack(-side=>"left");
 $chainEntry->pack(-side=>"left");
-$boxLabel->pack(-side=>"left");
-$boxEntry->pack(-side=>"left");
+$boxLabel1->pack(-side=>"left");
+$boxEntry1->pack(-side=>"left");
+$boxLabel2->pack(-side=>"left");
+$boxEntry2->pack(-side=>"left");
+$boxLabel3->pack(-side=>"left");
+$boxEntry3->pack(-side=>"left");
+$boxLabel4->pack(-side=>"left");
+$boxEntry4->pack(-side=>"left");
 #$startLabel->pack(-side=>"left");
 #$startEntry->pack(-side=>"left");
 
@@ -312,7 +339,13 @@ $chainFrame->pack(-side=>"top",
 		-anchor=>"e");
 #$startFrame->pack(-side=>"top",
 #		-anchor=>"e");
-$boxFrame->pack(-side=>"top",
+$boxFrame1->pack(-side=>"top",
+		-anchor=>"e");
+$boxFrame2->pack(-side=>"top",
+		-anchor=>"e");
+$boxFrame3->pack(-side=>"top",
+		-anchor=>"e");
+$boxFrame4->pack(-side=>"top",
 		-anchor=>"e");
 $pdbFrame->pack(-side=>"top",
 		-anchor=>"n");
@@ -397,7 +430,10 @@ print $ctlFile1
 WATER_ID\t".$fileIDw."REDUCED\t# Protein Data Bank ID for MD run
 Force_Field\t$forceID\t# AMBER force field to use in MD runs
 LIGAND_Field\t$dforceID\t# AMBER force field to use in MD runs
-Box_Size\t$octBox\t# water box size (buffer dist in angtroms)
+Box_Size_Complex\t$solvBoxCOMPLEX\t# water box size (buffer dist in angtroms)
+Box_Size_Host\t$solvBoxHOST\t# water box size (buffer dist in angtroms)
+Box_Size_Guest\t$solvBoxGUEST\t# water box size (buffer dist in angtroms)
+Box_Size_Water\t$solvBoxWATER\t# water box size (buffer dist in angtroms)
 Number_Runs\t$runsID\t# number of repeated samples of MD runs
 Heating_Time\t$cutoffValueHeatFS\t# length of heating run (fs)
 Equilibration_Time\t$cutoffValueEqFS\t# length of equilibration run (fs)
@@ -459,7 +495,10 @@ print $ctlFile2
 WATER_ID\t".$fileIDw."REDUCED\t# Protein Data Bank ID for MD run
 Force_Field\t$forceID\t# AMBER force field to use in MD runs
 LIGAND_Field\t$dforceID\t# AMBER force field to use in MD runs
-Box_Size\t$octBox\t# water box size (buffer dist in angtroms)
+Box_Size_Complex\t$solvBoxCOMPLEX\t# water box size (buffer dist in angtroms)
+Box_Size_Host\t$solvBoxHOST\t# water box size (buffer dist in angtroms)
+Box_Size_Guest\t$solvBoxGUEST\t# water box size (buffer dist in angtroms)
+Box_Size_Water\t$solvBoxWATER\t# water box size (buffer dist in angtroms)
 Number_Runs\t$runsID\t# number of repeated samples of MD runs
 Heating_Time\t$cutoffValueHeatFS\t# length of heating run (fs)
 Equilibration_Time\t$cutoffValueEqFS\t# length of equilibration run (fs)
@@ -674,9 +713,11 @@ system "pdb4amber -i ".$fileIDr."REDUCEDedit.pdb -o ".$fileIDr."REDUCEDadjust.pd
 system "pdb4amber -i ".$fileIDq."REDUCEDedit.pdb -o ".$fileIDq."REDUCEDadjust.pdb \n";
 }
 if ($remove_waters1 < 0){
-print "\nHouston we have a problem...protein+ligand should not have more waters than protein only.\n";
-print "...is ligand missing from file?\n";
-exit;
+print "\n THESE WATERBOX SETTINGS CANNOT BE ADJUSTED FOR tLeAP\n\n";
+print "\n\n\nIMPORTANT: increase the water box size for $fileIDr"."REDUCED.pdb (HOST)\n";
+print "relative to $fileIDq"."REDUCED.pdb (COMPLEX) and try again\n\n\n";
+print "NOTE: make control (.ctl) files again before trying tLeAP again\n\n";
+goto SKIP;
 }
 
 $remove_waters2 = $water_waters - $ligand_waters;
@@ -692,15 +733,18 @@ system "pdb4amber -i ".$fileIDl."REDUCEDedit.pdb -o ".$fileIDl."REDUCEDadjust.pd
 system "pdb4amber -i ".$fileIDl."REDUCEDedit.pdb -o ".$fileIDl."REDUCEDadjust.mol2 \n";
 }
 if ($remove_waters2 < 0){
-print "\nYou must now add $remove_waters2"." water molecules to $fileIDl"."REDUCEDedit.pdb\n";
-print "then resave as $fileIDl"."REDUCEDedit.pdb to balance waters in the simululations\n";
-print "IMPORTANT: CONSIDER ENLARGING THE WATER BOX SIZE AND RERUNNING PREP\n";
-print "IMPORTANT: if balanced properly, the difference should go to zero in the next step\n";
-system("gedit $fileIDl"."REDUCEDedit.pdb\n");
-system "pdb4amber -i ".$fileIDw."REDUCEDedit.pdb -o ".$fileIDw."REDUCEDadjust.pdb \n";
-system "pdb4amber -i ".$fileIDl."REDUCEDedit.pdb -o ".$fileIDl."REDUCEDadjust.pdb \n";
-system "pdb4amber -i ".$fileIDl."REDUCEDedit.pdb -o ".$fileIDl."REDUCEDadjust.mol2 \n";
+print "\n THESE WATERBOX SETTINGS CANNOT BE ADJUSTED FOR tLeAP\n\n";
+print "\n\n\nIMPORTANT: increase the water box size for $fileIDw"."REDUCED.pdb (HOST)\n";
+print "relative to $fileIDl"."REDUCED.pdb (COMPLEX) and try again\n\n\n";
+print "NOTE: make control (.ctl) files again before trying tLeAP again\n\n";  
+goto SKIP;
 }
+
+# open files
+print "\n\n check adjusted waters files\n\n";
+system("$chimera_path"."chimera $fileIDr"."REDUCEDadjust.pdb\n");
+system("$chimera_path"."chimera $fileIDw"."REDUCEDadjust.pdb\n");
+
 sleep(1);
 system "perl teLeap_ligandproteinReferenceBalance.pl\n";
 sleep(1);
@@ -769,10 +813,11 @@ print "(i.e. delete waters to satisfy complex+waterOnly = hostOnly+guestOnly)\n"
 print "(see https://ambermd.org/tutorials/advanced/tutorial21/index.php)\n\n";
 print "(use all-atom preset in UCSF Chimera to view solvated systems)\n\n";
 # open files
-system("$chimera_path"."chimera $fileIDr"."REDUCEDadjust.pdb\n");
-system("$chimera_path"."chimera $fileIDq"."REDUCEDadjust.pdb\n");
-system("$chimera_path"."chimera $fileIDl"."REDUCEDadjust.pdb\n");
-system("$chimera_path"."chimera $fileIDw"."REDUCEDadjust.pdb\n");
+print "\n\n check final files\n\n";
+system("$chimera_path"."chimera $fileIDr"."REDUCEDfinal.pdb\n");
+system("$chimera_path"."chimera $fileIDq"."REDUCEDfinal.pdb\n");
+system("$chimera_path"."chimera $fileIDl"."REDUCEDfinal.pdb\n");
+system("$chimera_path"."chimera $fileIDw"."REDUCEDfinal.pdb\n");
 
 # check file sizes afterwards for catastrophic failure
 my $filecheck1 = "vac_".$fileIDq."REDUCED.prmtop";
@@ -801,7 +846,7 @@ print "combined file size for hostOnly+guestOnly = $checksize2\n\n";
 sleep(1);print "IMPORTANT: make sure the waters are balanced in simulations\n";
 print "(i.e. delete waters to satisfy complex+waterOnly = hostOnly+guestOnly)\n";
 print "(see https://ambermd.org/tutorials/advanced/tutorial21/index.php)\n\n";
-
+SKIP:
 }
 
 ######################################################################################################

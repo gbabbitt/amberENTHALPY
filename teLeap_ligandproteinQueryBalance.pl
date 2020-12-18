@@ -35,7 +35,10 @@ for (my $c = 0; $c <= scalar @IN; $c++){
     if ($header eq "WATER_ID") { $WATER_ID = $value;}
     if ($header eq "Force_Field") { $Force_Field = $value;}
     if ($header eq "LIGAND_Field") { $LIGAND_Field = $value;}
-    if ($header eq "Box_Size") { $Box_Size = $value;}
+    if ($header eq "Box_Size_Complex") { $Box_Size_Complex = $value;}
+    if ($header eq "Box_Size_Host") { $Box_Size_Host = $value;}
+    if ($header eq "Box_Size_Guest") { $Box_Size_Guest = $value;}
+    if ($header eq "Box_Size_Water") { $Box_Size_Water = $value;}
     if ($header eq "Number_Runs") { $Number_Runs = $value;}
     if ($header eq "Heating_Time") { $Heating_Time = $value;}
     if ($header eq "Equilibration_Time") { $Equilibration_Time = $value;}
@@ -100,9 +103,9 @@ if (-e "$protein_label.pdb") { print "$protein_label.pdb found\n"; }
 =cut
 
 ####################################################################
-# find ligand water box size
+# find empty water box size
 ####################################################################
-open(IN, "<"."wat_$ligand_label.inpcrd") or die "could not open input coordinate file\n";
+open(IN, "<"."watUNADJUST_$water_label.inpcrd") or die "could not open input coordinate file\n";
 @IN = <IN>;
 for (my $a = 0; $a < scalar @IN; $a++){ # catches values from last line of .inpcrd file
     $INrow = $IN[$a];
@@ -115,7 +118,7 @@ for (my $a = 0; $a < scalar @IN; $a++){ # catches values from last line of .inpc
     if ($Zval != '') {$Zsize = $Zval;};
     print "$Xval\t"."$Yval\t"."$Zval\n";
 }
-print "ligand water box size\n";
+print "empty water box size\n";
 print "$Xsize\t"."$Ysize\t"."$Zsize\n";
 sleep(1);
 close IN;
@@ -124,15 +127,15 @@ close IN;
 # Water: Prepare the input file for tleap 
 ####################################################################
 
-open(LEAP_WATER, ">"."$water_label.bat") or die "could not open LEAP file\n";
+open(LEAP_WATER, ">"."$water_label"."adjust.bat") or die "could not open LEAP file\n";
 	print LEAP_WATER "source "."$teleap_path"."leaprc.water.tip3p\n";
      print LEAP_WATER "water$water_label = loadpdb $water_label"."adjust.pdb\n";
      print LEAP_WATER "check water$water_label\n";
      print LEAP_WATER "addions water$water_label Na+ 0\n"; # to charge or neutralize explicit solvent
      print LEAP_WATER "addions water$water_label Cl- 0\n"; # to charge or neutralize explicit solvent
      print LEAP_WATER "set water$water_label box {$Xsize $Ysize $Zsize}\n";
-     #print LEAP_WATER "setBox water$water_label vdw {$Large_Box_Size $Large_Box_Size $Large_Box_Size}\n";
      print LEAP_WATER "saveamberparm water$water_label wat"."_$water_label.prmtop wat"."_$water_label.inpcrd\n";
+     print LEAP_WATER "savepdb water$water_label "."$water_label"."final.pdb\n";
      print LEAP_WATER "quit\n";
 close LEAP_WATER;
 
@@ -145,19 +148,19 @@ print "  default is simple rigid 3 point model, charge neutralized with Na+\n";
 print "  close .bat when done\n\n";
 sleep(2);
 
-system "gedit $water_label.bat\n";
-
+system "gedit $water_label"."adjust.bat\n";
 
 ######################################################################################
 # Run sequence through tleap: prepare topology (prmtop) and coordinate (inpcrd) files
 ######################################################################################
-print "  running ligand input file for teLeap\n\n";
+print "  running water input file for teLeap\n\n";
 sleep(1);
-open(TLEAP_WATER, '|-', "tleap -f $water_label.bat");
+open(TLEAP_WATER, '|-', "tleap -f $water_label"."adjust.bat");
 	print<TLEAP_WATER>;
 close TLEAP_WATER;
 
-sleep(1);
+
+
 
 
 ######################################################################
