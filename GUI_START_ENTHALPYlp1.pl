@@ -1132,8 +1132,10 @@ print OUT5 "avg potential energy water only = $meanWATER +- $sdWATER kcal/mol\n"
 
 # calculate delta H  (binding enthalpy)  
 $meanENTHALPY = $meanCOMPLEX + $meanWATER - $meanHOST - $meanGUEST;
+$meanENTHALPY = sprintf("%.3f", $meanENTHALPY);
 #calculate standard deviation
 $sdENTHALPY = ($sdCOMPLEX + $sdWATER + $sdHOST + $sdGUEST)/4;
+$sdENTHALPY = sprintf("%.3f", $sdENTHALPY);
 # output
 print "\n\nESTIMATED BINDING ENTHALPY = $meanENTHALPY"." +- "."$sdENTHALPY"." kcal/mol\n";
 print "collected over $nCOMPLEX". " samples spanning $timetot"." nanoseconds\n\n";
