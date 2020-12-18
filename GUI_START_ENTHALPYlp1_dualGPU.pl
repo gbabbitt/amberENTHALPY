@@ -981,7 +981,7 @@ for (my $i = 0; $i < $runsID; $i++){
      my @IN1 = <IN1>;
      for (my $ii = 0; $ii < scalar @IN1; $ii++){
         my $IN1row = $IN1[$ii];
-        if($IN1row =~ m/A V E R A G E S/){goto EXIT1;}
+        if($IN1row =~ m/A V E R A G E S/){goto EXIT1;} # exits collection loop before average value is reported
 	   my @IN1row = split(/\s+/, $IN1row); 
 	   my $test = $IN1row[1];
         #print "my test "."$test\n";
@@ -1002,7 +1002,7 @@ for (my $i = 0; $i < $runsID; $i++){
      my @IN2 = <IN2>;
      for (my $ii = 0; $ii < scalar @IN2; $ii++){
         my $IN2row = $IN2[$ii];
-        if($IN2row =~ m/A V E R A G E S/){goto EXIT2;}
+        if($IN2row =~ m/A V E R A G E S/){goto EXIT2;} # exits collection loop before average value is reported
 	   my @IN2row = split(/\s+/, $IN2row); 
 	   my $test = $IN2row[1];
         #print "my test "."$test\n";
@@ -1023,7 +1023,7 @@ for (my $i = 0; $i < $runsID; $i++){
      my @IN3 = <IN3>;
      for (my $ii = 0; $ii < scalar @IN3; $ii++){
         my $IN3row = $IN3[$ii];
-        if($IN3row =~ m/A V E R A G E S/){goto EXIT3;}
+        if($IN3row =~ m/A V E R A G E S/){goto EXIT3;} # exits collection loop before average value is reported
 	   my @IN3row = split(/\s+/, $IN3row); 
 	   my $test = $IN3row[1];
         #print "my test "."$test\n";
@@ -1044,7 +1044,7 @@ for (my $i = 0; $i < $runsID; $i++){
      my @IN4 = <IN4>;
      for (my $ii = 0; $ii < scalar @IN4; $ii++){
         my $IN4row = $IN4[$ii];
-        if($IN4row =~ m/A V E R A G E S/){goto EXIT4;}
+        if($IN4row =~ m/A V E R A G E S/){goto EXIT4;} # exits collection loop before average value is reported
 	   my @IN4row = split(/\s+/, $IN4row); 
 	   my $test = $IN4row[1];
         #print "my test "."$test\n";
@@ -1064,7 +1064,10 @@ close OUT3;
 close OUT4;
 
 # calculate binding enthalpy
-my @enthalpies = ();
+my @energy_complex = ();
+my @energy_host = ();
+my @energy_guest = ();
+my @energy_water = ();
 open (IN1, "<"."./MDoutput/ENERGYstatisticsCOMPLEX.txt");
 open (IN2, "<"."./MDoutput/ENERGYstatisticsHOST.txt");
 open (IN3, "<"."./MDoutput/ENERGYstatisticsGUEST.txt");
@@ -1087,33 +1090,92 @@ for (my $k = 0; $k < scalar @IN1; $k++){
         $EP_host = $IN2row[2];
         $EP_guest = $IN3row[2];
         $EP_water = $IN4row[2];
-        $enthalpy = $EP_complex + $EP_water - $EP_host - $EP_guest;
         #print "EP complex = "."$EP_complex\n";
         #print "EP water = "."$EP_water\n";
         #print "EP host = "."$EP_host\n";
         #print "EP guest = "."$EP_guest\n";
-        #print "enthalpy = "."$enthalpy\n";
-        push (@enthalpies, $enthalpy);
+        push (@energy_complex, $EP_complex);
+        push (@energy_host, $EP_host);
+        push (@energy_guest, $EP_guest);
+        push (@energy_water, $EP_water);
         }
      close IN1;
      close IN2;
      close IN3;
      close IN4;
+
      
-# avg and sd
-$statSCORE = new Statistics::Descriptive::Full; # residue avg flux - reference
-$statSCORE->add_data (@enthalpies);
-$meanENTHALPY = $statSCORE->mean();
-$meanENTHALPY = $meanENTHALPY;
-$nENTHALPY = $statSCORE->count();
-$sdENTHALPY = $statSCORE->standard_deviation();
-$sdENTHALPY = $sdENTHALPY;
-$seENTHALPY = $sdENTHALPY/sqrt($nENTHALPY);
-# round to 0.001
-$meanENTHALPY = sprintf("%.3f", $meanENTHALPY);
-$seENTHALPY = sprintf("%.3f", $seENTHALPY);
+# calculate stats for 4 groups
 $timetot = $cutoffValueProdFS*$runsID/1000000;
 
+open (OUT5, ">"."./MDoutput/bindingENTHALPY.txt");
+# complex
+$statSCORE = new Statistics::Descriptive::Full;
+$statSCORE->add_data (@energy_complex);
+$meanCOMPLEX = $statSCORE->mean();
+$nCOMPLEX = $statSCORE->count();
+$sdCOMPLEX = $statSCORE->standard_deviation();
+$seCOMPLEX = $sdCOMPLEX/sqrt($nCOMPLEX);
+# round to 0.001
+$meanCOMPLEX = sprintf("%.3f", $meanCOMPLEX);
+$seCOMPLEX = sprintf("%.3f", $seCOMPLEX);
+$sdCOMPLEX = sprintf("%.3f", $sdCOMPLEX);
+print "avg potential energy for protein-ligand complex = $meanCOMPLEX +- $sdCOMPLEX kcal/mol\n";
+print OUT5 "avg potential energy for protein-ligand complex = $meanCOMPLEX +- $sdCOMPLEX kcal/mol\n";
+
+# host
+$statSCORE = new Statistics::Descriptive::Full;
+$statSCORE->add_data (@energy_host);
+$meanHOST = $statSCORE->mean();
+$nHOST = $statSCORE->count();
+$sdHOST = $statSCORE->standard_deviation();
+$seHOST = $sdHOST/sqrt($nHOST);
+# round to 0.001
+$meanHOST = sprintf("%.3f", $meanHOST);
+$seHOST = sprintf("%.3f", $seHOST);
+$sdHOST = sprintf("%.3f", $sdHOST);
+print "avg potential energy for protein host = $meanHOST +- $sdHOST kcal/mol\n";
+print OUT5 "avg potential energy protein host = $meanHOST +- $sdHOST kcal/mol\n";
+
+# guest
+$statSCORE = new Statistics::Descriptive::Full;
+$statSCORE->add_data (@energy_guest);
+$meanGUEST = $statSCORE->mean();
+$nGUEST = $statSCORE->count();
+$sdGUEST = $statSCORE->standard_deviation();
+$seGUEST = $sdGUEST/sqrt($nGUEST);
+# round to 0.001
+$meanGUEST = sprintf("%.3f", $meanGUEST);
+$seGUEST = sprintf("%.3f", $seGUEST);
+$sdGUEST = sprintf("%.3f", $sdGUEST);
+print "avg potential energy for ligand guest = $meanGUEST +- $sdGUEST kcal/mol\n";
+print OUT5 "avg potential energy ligand guest = $meanGUEST +- $sdGUEST kcal/mol\n"; 
+ 
+# water
+$statSCORE = new Statistics::Descriptive::Full;
+$statSCORE->add_data (@energy_water);
+$meanWATER = $statSCORE->mean();
+$nWATER = $statSCORE->count();
+$sdWATER = $statSCORE->standard_deviation();
+$seWATER = $sdWATER/sqrt($nWATER);
+# round to 0.001
+$meanWATER = sprintf("%.3f", $meanWATER);
+$seWATER = sprintf("%.3f", $seWATER);
+$sdWATER = sprintf("%.3f", $sdWATER);
+print "avg potential energy for water only = $meanWATER +- $sdWATER kcal/mol\n";
+print OUT5 "avg potential energy water only = $meanWATER +- $sdWATER kcal/mol\n";
+
+# calculate delta H  (binding enthalpy)  
+$meanENTHALPY = $meanCOMPLEX + $meanWATER - $meanHOST - $meanGUEST;
+#calculate standard deviation
+$sdENTHALPY = ($sdCOMPLEX + $sdWATER + $sdHOST + $sdGUEST)/4;
+# output
+print "\n\nESTIMATED BINDING ENTHALPY = $meanENTHALPY"." +- "."$sdENTHALPY"." kcal/mol\n";
+print "collected over $nCOMPLEX". " samples spanning $timetot"." nanoseconds\n\n";
+print OUT5 "ESTIMATED BINDING ENTHALPY = $meanENTHALPY"." +- "."$sdENTHALPY"." kcal/mol\n";
+print OUT5 "collected over $nCOMPLEX". " samples spanning $timetot"." nanoseconds\n\n";
+close OUT5;
+sleep(2);
 # image and movie rendering
 print "TO RECORD MOVIE:\n";
 print "open UCSF Chimera\n";
@@ -1122,14 +1184,7 @@ print "select input file (e.g. wat_1yet_boundREDUCED.prmtop)\n";
 print "add trajectory file (e.g. prod_1yet_boundREDUCED_0.nc)\n";
 print "on MD Movie window go to File/Record Movie\n\n";
 sleep(2);
-#system("$chimera_path"."chimera");
 
-open (OUT5, ">"."./MDoutput/bindingENTHALPY.txt");
-print "\n\nESTIMATED BINDING ENTHALPY = $meanENTHALPY"." +- "."$seENTHALPY"." kcal/mol\n";
-print "collected over $nENTHALPY". " samples spanning $timetot"." nanoseconds\n\n";
-print OUT5 "ESTIMATED BINDING ENTHALPY = $meanENTHALPY"." +- "."$seENTHALPY"." kcal/mol\n";
-print OUT5 "collected over $nENTHALPY". " samples spanning $timetot"." nanoseconds\n\n";
-close OUT5;
 }
 ##################################################################################################
 
