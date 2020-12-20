@@ -42,8 +42,8 @@ my $cutoffValueEqFS=0;
 my $cutoffValueProdFS=0;
 my $solvBoxCOMPLEX = 30;
 my $solvBoxHOST = 30;
-my $solvBoxGUEST = 30;
-my $solvBoxWATER = 35;
+my $solvBoxGUEST = 49.5;
+my $solvBoxWATER = 54;
 my @fullfile;
 my @chainlen;
 my @fullfile2;
@@ -708,10 +708,75 @@ close LEAP;
 print "\nnumber of waters in water box...\n";
 print "waterONLY = "."$water_waters\n";
 print "guestONLY = "."$ligand_waters\n";
-print "host + guest complex = "."$complex_waters\n";
+print "host-guest complex = "."$complex_waters\n";
 print "hostONLY = "."$host_waters\n";
 $remove_waters1 = $host_waters - $complex_waters;
+$remove_waters2 = $water_waters - $ligand_waters;
 sleep(1);
+$ratio1 = $remove_waters1/$host_waters;
+$ratio2 = $remove_waters2/$water_waters;
+$ratio3 = ($complex_waters + $water_waters)/($ligand_waters + $host_waters);
+print "colecting ratios\n";
+print "$ratio1\t"."$ratio2\t"."$ratio3\n";
+sleep(3);
+
+# evaluating relative box sizes
+print "\n EVALUATING WATERBOX SIZE SETTINGS...\n\n";
+print "NOTE: to properly balance the simulations the number waters must satisfy...\n\n";
+print "hostONLY > host + guest complex\n";
+print "waterONLY > guestONLY\n";
+print "waters needed removed from hostONLY < 5% of waters currently in hostONLY\n";
+print "waters needed removed from waterONLY < 5% of waters currently in waterONLY\n";
+print "host-guest complex roughly equal waterONLY\n";
+print "hostONLY roughly equal guestONLY\n\n";
+print "THE GOAL HERE IS TO TRY TO FIND A SET OF WATER BOX SIZES THAT\n";
+print "MINIMIZES THE NUMBER OF WATERS NEEDING REMOVED FOR BALANCING\n\n";
+sleep(3);
+
+if ($remove_waters1 < 0){
+print "\n THESE WATERBOX SETTINGS CANNOT BE ADJUSTED FOR tLeAP\n\n";
+print "\n\n\nIMPORTANT: increase the water box size for $fileIDr"."REDUCED.pdb (HOST)\n";
+print "relative to $fileIDq"."REDUCED.pdb (COMPLEX) and try again\n\n\n";
+print "NOTE: make control (.ctl) files again before trying tLeAP again\n\n";
+goto SKIP;
+}
+if ($remove_waters2 < 0){
+print "\n THESE WATERBOX SETTINGS CANNOT BE ADJUSTED FOR tLeAP\n\n";
+print "\n\n\nIMPORTANT: increase the water box size for $fileIDw"."REDUCED.pdb (EMPTY)\n";
+print "relative to $fileIDl"."REDUCED.pdb (GUEST) and try again\n\n\n";
+print "NOTE: make control (.ctl) files again before trying tLeAP again\n\n";  
+goto SKIP;
+}
+if ($ratio1 > 0.05){
+print "WARNING: you are removing too many waters from hostONLY\n";
+print "this will likely cause fatal density fluctuations during run\n";
+print "decrease the water box size for $fileIDr"."REDUCED.pdb (HOST)\n";
+print "relative to $fileIDq"."REDUCED.pdb (COMPLEX) and try again\n\n\n";
+goto SKIP;
+}
+if ($ratio2 > 0.05){
+print "WARNING: you are removing too many waters from waterONLY\n";
+print "this will likely cause fatal density fluctuations during run\n";
+print "decrease the water box size for $fileIDw"."REDUCED.pdb (EMPTY)\n";
+print "relative to $fileIDl"."REDUCED.pdb (GUEST) and try again\n\n\n";
+goto SKIP;
+}
+if ($ratio3 > 1.1 || $ratio3 < 0.9){
+print "WARNING: water boxes are not all roughly the same size\n";
+print "increase the water box sizes for $fileIDw"."REDUCED.pdb (EMPTY)\n";
+print "and $fileIDl"."REDUCED.pdb (GUEST) relative to \n";
+print "$fileIDr"."REDUCED.pdb (HOST) and $fileIDq"."REDUCED.pdb (COMPLEX)\n";
+print "and try again\n\n\n";
+goto SKIP;
+}
+print "\n THERE APPEAR NO MAJOR ERRORS...PROCEDING TO BALANCING\n\n";
+sleep(1);
+print "\n AFTER BALANCING WATERS IN THE 4 SYSTEMS...\n\n";
+print "REQUIRED: host-guest complex + waterONLY - hostONLY - guestONLY = 0\n";
+print "NOTE: the computer will later check this requirement\n\n";
+sleep(3);
+
+# adjust water boxes
 if ($remove_waters1 >= 0){
 print "\nYou must now remove $remove_waters1"." water molecules from $fileIDr"."REDUCEDedit.pdb\n";
 print "then resave as $fileIDr"."REDUCEDedit.pdb to balance waters in the simululations\n";
@@ -721,16 +786,7 @@ system("gedit $fileIDr"."REDUCEDedit.pdb\n");
 system "pdb4amber -i ".$fileIDr."REDUCEDedit.pdb -o ".$fileIDr."REDUCEDadjust.pdb \n";
 system "pdb4amber -i ".$fileIDq."REDUCEDedit.pdb -o ".$fileIDq."REDUCEDadjust.pdb \n";
 }
-if ($remove_waters1 < 0){
-print "\n THESE WATERBOX SETTINGS CANNOT BE ADJUSTED FOR tLeAP\n\n";
-print "\n\n\nIMPORTANT: increase the water box size for $fileIDr"."REDUCED.pdb (HOST)\n";
-print "relative to $fileIDq"."REDUCED.pdb (COMPLEX) and try again\n\n\n";
-print "NOTE: make control (.ctl) files again before trying tLeAP again\n\n";
-goto SKIP;
-}
 
-$remove_waters2 = $water_waters - $ligand_waters;
-sleep(1);
 if ($remove_waters2 >= 0){
 print "\nYou must now remove $remove_waters2"." water molecules from $fileIDw"."REDUCEDedit.pdb\n";
 print "then resave as $fileIDw"."REDUCEDedit.pdb to balance waters in the simululations\n";
@@ -741,13 +797,7 @@ system "pdb4amber -i ".$fileIDw."REDUCEDedit.pdb -o ".$fileIDw."REDUCEDadjust.pd
 system "pdb4amber -i ".$fileIDl."REDUCEDedit.pdb -o ".$fileIDl."REDUCEDadjust.pdb \n";
 system "pdb4amber -i ".$fileIDl."REDUCEDedit.pdb -o ".$fileIDl."REDUCEDadjust.mol2 \n";
 }
-if ($remove_waters2 < 0){
-print "\n THESE WATERBOX SETTINGS CANNOT BE ADJUSTED FOR tLeAP\n\n";
-print "\n\n\nIMPORTANT: increase the water box size for $fileIDw"."REDUCED.pdb (HOST)\n";
-print "relative to $fileIDl"."REDUCED.pdb (COMPLEX) and try again\n\n\n";
-print "NOTE: make control (.ctl) files again before trying tLeAP again\n\n";
-goto SKIP;
-}
+
 
 # open files
 print "\n\n check adjusted waters files\n\n";
@@ -812,7 +862,7 @@ close LEAP;
 print "\nnumber of waters in water box...\n";
 print "waterONLY = "."$water_waters\n";
 print "guestONLY = "."$ligand_waters\n";
-print "host + guest complex = "."$complex_waters\n";
+print "host-guest complex = "."$complex_waters\n";
 print "hostONLY = "."$host_waters\n";
 sleep(1);
 $balance_waters = $complex_waters + $water_waters - $host_waters - $ligand_waters;
@@ -856,40 +906,6 @@ sleep(1);print "IMPORTANT: make sure the waters are balanced in simulations\n";
 print "(i.e. delete waters to satisfy complex+waterOnly = hostOnly+guestOnly)\n";
 print "(see https://ambermd.org/tutorials/advanced/tutorial21/index.php)\n\n";
 SKIP:
-}
-
-######################################################################################################
-sub reduce { # create PDB files for teLeap
-sleep(1);print "DO YOU WANT TO REDUCE THE ENTIRE STRUCTURE? (y or n)\n";
-print "i.e. answer 'n' if protonation state is already prepared ahead of time \n";
-my $reduce_enter = <STDIN>;
-chop($reduce_enter); # NOTE: for binding enthalpy crystallographic waters are not removed
-if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry --reduce \n";}
-if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry \n";}
-if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry --reduce \n";}
-if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry \n";}
-if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDl.pdb -o ".$fileIDl."REDUCED.pdb --dry --reduce \n";}
-if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDl.pdb -o ".$fileIDl."REDUCED.pdb --dry \n";}
-if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDw.pdb -o ".$fileIDw."REDUCED.pdb --reduce \n";}
-if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDw.pdb -o ".$fileIDw."REDUCED.pdb \n";}
-if ($reduce_enter eq "yes"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry --reduce \n";}
-if ($reduce_enter eq "no"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry \n";}
-if ($reduce_enter eq "yes"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry --reduce \n";}
-if ($reduce_enter eq "no"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry \n";}
-if ($reduce_enter eq "yes"){system "pdb4amber -i $fileIDl.pdb -o ".$fileIDl."REDUCED.pdb --dry --reduce \n";}
-if ($reduce_enter eq "no"){system "pdb4amber -i $fileIDl.pdb -o ".$fileIDl."REDUCED.pdb --dry \n";}
-if ($reduce_enter eq "yes"){system "pdb4amber -i $fileIDw.pdb -o ".$fileIDw."REDUCED.pdb --reduce \n";}
-if ($reduce_enter eq "no"){system "pdb4amber -i $fileIDw.pdb -o ".$fileIDw."REDUCED.pdb \n";}
-sleep(1);
-print "opening USCF Chimera and loading both PDB structures\n\n";
-print "CHECK THAT ALL CHAINS ARE NUMBERED SEQUENTIALLY STARTING FROM 1 to END OF LAST CHAIN\n";
-print "(use Tools/Structure Editing/Renumber Residues)\n\n";
-system("$chimera_path"."chimera $fileIDr"."REDUCED.pdb\n");
-system("$chimera_path"."chimera $fileIDq"."REDUCED.pdb\n");
-system("$chimera_path"."chimera $fileIDl"."REDUCED.pdb\n");
-system("$chimera_path"."chimera $fileIDw"."REDUCED.pdb\n");
-sleep(1);
-print "\n\npdb4amber is completed\n\n";
 }
 
 
