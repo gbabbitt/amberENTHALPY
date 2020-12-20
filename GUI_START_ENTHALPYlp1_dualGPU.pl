@@ -712,11 +712,11 @@ print "host-guest complex = "."$complex_waters\n";
 print "hostONLY = "."$host_waters\n";
 $remove_waters1 = $host_waters - $complex_waters;
 $remove_waters2 = $water_waters - $ligand_waters;
-sleep(1);
+sleep(2);
 $ratio1 = $remove_waters1/$host_waters;
 $ratio2 = $remove_waters2/$water_waters;
 $ratio3 = ($complex_waters + $water_waters)/($ligand_waters + $host_waters);
-print "colecting ratios\n";
+print "\ncollecting ratios\n";
 print "$ratio1\t"."$ratio2\t"."$ratio3\n";
 sleep(3);
 
@@ -769,7 +769,7 @@ print "$fileIDr"."REDUCED.pdb (HOST) and $fileIDq"."REDUCED.pdb (COMPLEX)\n";
 print "and try again\n\n\n";
 goto SKIP;
 }
-print "\n THERE APPEAR NO MAJOR ERRORS...PROCEDING TO BALANCING\n\n";
+print "\n THERE APPEAR NO MAJOR ERRORS...PROCEEDING TO BALANCING\n\n";
 sleep(1);
 print "\n AFTER BALANCING WATERS IN THE 4 SYSTEMS...\n\n";
 print "REQUIRED: host-guest complex + waterONLY - hostONLY - guestONLY = 0\n";
@@ -1232,10 +1232,15 @@ $meanENTHALPY = sprintf("%.3f", $meanENTHALPY);
 #calculate standard deviation
 $sdENTHALPY = ($sdCOMPLEX + $sdWATER + $sdHOST + $sdGUEST)/4;
 $sdENTHALPY = sprintf("%.3f", $sdENTHALPY);
+#calculate standard error of the mean
+$seENTHALPY = ($seCOMPLEX + $seWATER + $seHOST + $seGUEST)/4;
+$seENTHALPY = sprintf("%.3f", $seENTHALPY);
 # output
-print "\n\nESTIMATED BINDING ENTHALPY = $meanENTHALPY"." +- "."$sdENTHALPY"." kcal/mol\n";
+print "\n\nESTIMATED BINDING ENTHALPY = $meanENTHALPY"." +- "."$sdENTHALPY"."sd kcal/mol\n";
+print "ESTIMATED BINDING ENTHALPY = $meanENTHALPY"." +- "."$seENTHALPY"."se kcal/mol\n";
 print "collected over $nCOMPLEX". " samples spanning $timetot"." nanoseconds\n\n";
-print OUT5 "ESTIMATED BINDING ENTHALPY = $meanENTHALPY"." +- "."$sdENTHALPY"." kcal/mol\n";
+print OUT5 "ESTIMATED BINDING ENTHALPY = $meanENTHALPY"." +- "."$sdENTHALPY"."sd kcal/mol\n";
+print OUT5 "ESTIMATED BINDING ENTHALPY = $meanENTHALPY"." +- "."$seENTHALPY"."se kcal/mol\n";
 print OUT5 "collected over $nCOMPLEX". " samples spanning $timetot"." nanoseconds\n\n";
 close OUT5;
 sleep(2);
