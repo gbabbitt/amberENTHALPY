@@ -24,18 +24,26 @@ protein-ligand COMPLEX + water ONLY = protein ONLY + ligand only
 
 when evaluating relative water box sizes, the program will instruct users based upon the following criteria
 NOTE: to properly balance the simulations the number waters must satisfy...
+
 hostONLY > host + guest complex
+
 waterONLY > guestONLY
+
 waters needed removed from hostONLY less than five percent of waters currently in hostONLY
+
 waters needed removed from waterONLY less than five percent of waters currently in waterONLY
+
 host-guest complex roughly equal waterONLY
+
 hostONLY roughly equal guestONLY
+
 THE GOAL HERE IS TO TRY TO FIND A SET OF WATER BOX SIZES THAT
 MINIMIZES THE NUMBER OF WATERS NEEDING REMOVED FOR BALANCING
+
 The removal of too many waters will cause density instabilities during the runs. 
 
 
-NOTE: The GUI downloads with a preloaded example files for geldanamycin bound to the Hsp90 chaperone protein (PDB: 1yet)
+NOTE: The GUI downloads with a preloaded example files for the kinase inhibitor sorafenib bound to the B-Raf kinase protein (PDB: 1uwh)
 
 ALSO NOTE: use a slightly larger water box than you would in normal MD simulation. If any MD runs abort due to unstable box boundaries, then increase the water box size and restart from the beginning. The box size on the GUI indicates the buffer distance from the surface of the protein or ligand to the edge of the water box. Because the ligand and single starting water molecule used to build the empty water simulation are so much smaller than a typical protein, a buffer size of 1.5 times the box size is used to build the ligand ONLY and water ONLY systems. 
 
