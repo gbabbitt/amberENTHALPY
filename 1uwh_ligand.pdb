@@ -1,0 +1,99 @@
+EXPDTA    THEORETICAL MODEL, MODELLER 9.17 2019/07/06 10:52:16
+REMARK   6 MODELLER OBJECTIVE FUNCTION:        23.4500
+REMARK   6 MODELLER BEST TEMPLATE % SEQ ID: 100.000
+REMARK   6 GA341 score: 1.00000
+REMARK   6 Normalized DOPE score: -1.44665
+REMARK   6 MODELLER BLK RESIDUE  277:
+REMARK   6 MODELLER BLK RESIDUE  278:
+HETATM    1  C1  BAX   277      77.625  47.854  68.564  1.00  0.69           C
+HETATM    2  C2  BAX   277      77.199  48.825  67.680  1.00  0.69           C
+HETATM    3  C3  BAX   277      77.042  50.154  68.068  1.00  0.69           C
+HETATM    4  C4  BAX   277      77.308  50.507  69.359  1.00  0.69           C
+HETATM    5  C13 BAX   277      76.169  47.357  65.531  1.00  0.69           C
+HETATM    6  C16 BAX   277      75.307  46.208  63.352  1.00  0.69           C
+HETATM    7  C17 BAX   277      75.702  45.871  61.982  1.00  0.69           C
+HETATM    8  C18 BAX   277      74.971  44.907  61.297  1.00  0.69           C
+HETATM    9  C19 BAX   277      73.894  44.262  61.889  1.00  0.69           C
+HETATM   10  C20 BAX   277      73.516  44.571  63.209  1.00  0.69           C
+HETATM   11  C21 BAX   277      74.212  45.545  63.946  1.00  0.69           C
+HETATM   12  O22 BAX   277      73.211  43.336  61.150  1.00  0.69           O
+HETATM   13  C24 BAX   277      74.620  41.337  61.900  1.00  0.69           C
+HETATM   14  C25 BAX   277      74.598  39.963  62.059  1.00  0.69           C
+HETATM   15  C27 BAX   277      72.270  39.932  61.216  1.00  0.69           C
+HETATM   16  C28 BAX   277      72.327  41.260  61.079  1.00  0.69           C
+HETATM   17  N30 BAX   277      70.504  37.919  61.353  1.00  0.69           N
+HETATM   18  C31 BAX   277      70.060  37.033  60.323  1.00  0.69           C
+HETATM   19  C5  BAX   277      77.738  49.546  70.268  1.00  0.69           C
+HETATM   20  C6  BAX   277      77.906  48.159  69.870  1.00  0.69           C
+HETATM   21  C7  BAX   277      78.335  47.149  70.729  1.00  0.69           C
+HETATM   22  F8  BAX   277      79.564  47.394  71.140  1.00  0.69           F
+HETATM   23  F9  BAX   277      77.505  47.070  71.773  1.00  0.69           F
+HETATM   24  F10 BAX   277      78.372  45.938  70.185  1.00  0.69           F
+HETATM   25 CL11 BAX   277      78.047  50.140  71.920  1.00  0.69          Cl
+HETATM   26  N12 BAX   277      76.919  48.402  66.361  1.00  0.69           N
+HETATM   27  N14 BAX   277      76.064  47.358  64.148  1.00  0.69           N
+HETATM   28  O15 BAX   277      76.250  46.301  66.057  1.00  0.69           O
+HETATM   29  C23 BAX   277      73.414  41.980  61.386  1.00  0.69           C
+HETATM   30  N26 BAX   277      73.390  39.247  61.708  1.00  0.69           N
+HETATM   31  C29 BAX   277      70.923  39.227  60.822  1.00  0.69           C
+HETATM   32  O32 BAX   277      69.913  39.982  60.569  1.00  0.69           O
+HETATM   33  O   HOH   280      80.180  35.635  59.455  1.00  0.00           O
+HETATM   34  O   HOH   281      83.742  43.136  67.780  1.00  0.00           O
+HETATM   35  O   HOH   282      83.894  40.634  69.410  1.00  0.00           O
+HETATM   36  O   HOH   283      88.645  43.418  58.035  1.00  0.00           O
+HETATM   37  O   HOH   284      55.736  37.762  74.433  1.00  0.00           O
+HETATM   38  O   HOH   285      82.887  38.961  81.156  1.00  0.00           O
+HETATM   39  O   HOH   286      88.839  41.930  74.014  1.00  0.00           O
+HETATM   40  O   HOH   287      79.210  46.764  84.890  1.00  0.00           O
+HETATM   41  O   HOH   288      90.625  43.687  74.453  1.00  0.00           O
+HETATM   42  O   HOH   289      68.787  32.251  67.025  1.00  0.00           O
+HETATM   43  O   HOH   290      81.934  37.782  68.163  1.00  0.00           O
+HETATM   44  O   HOH   291      60.812  52.044  81.379  1.00  0.00           O
+HETATM   45  O   HOH   292      71.820  56.314  84.942  1.00  0.00           O
+HETATM   46  O   HOH   293      68.164  51.867  80.787  1.00  0.00           O
+HETATM   47  O   HOH   294      61.124  49.920  82.620  1.00  0.00           O
+HETATM   48  O   HOH   295      54.737  44.136  83.765  1.00  0.00           O
+HETATM   49  O   HOH   296      60.065  52.931  88.085  1.00  0.00           O
+HETATM   50  O   HOH   301      87.907  41.259  59.042  1.00  0.00           O
+HETATM   51  O   HOH   303     104.441  16.464  52.004  1.00  0.00           O
+HETATM   52  O   HOH   304     105.843  27.690  47.535  1.00  0.00           O
+HETATM   53  O   HOH   305      99.045  30.321  41.238  1.00  0.00           O
+HETATM   54  O   HOH   306     102.578  23.400  52.257  1.00  0.00           O
+HETATM   55  O   HOH   307     102.247  26.290  54.067  1.00  0.00           O
+HETATM   56  O   HOH   308      98.186   8.354  50.591  1.00  0.00           O
+HETATM   57  O   HOH   309     102.218  15.904  51.213  1.00  0.00           O
+HETATM   58  O   HOH   310      97.524   6.945  53.099  1.00  0.00           O
+HETATM   59  O   HOH   311      94.630  32.650  47.990  1.00  0.00           O
+CONECT    1    2   20
+CONECT    5   26   27   28
+CONECT    6    7   11   27
+CONECT    7    6    8
+CONECT    8    7    9
+CONECT    9    8   10   12
+CONECT    2    1    3   26
+CONECT   10    9   11
+CONECT   11    6   10
+CONECT   29   12   13   16
+CONECT   13   14   29
+CONECT   14   13   30
+CONECT   15   16   30   31
+CONECT   16   15   29
+CONECT   31   15   17   32
+CONECT    3    2    4
+CONECT   18   17
+CONECT    4    3   19
+CONECT   19    4   20   25
+CONECT   20    1   19   21
+CONECT   21   20   22   23   24
+CONECT   25   19
+CONECT   24   21
+CONECT   22   21
+CONECT   23   21
+CONECT   26    2    5
+CONECT   27    5    6
+CONECT   30   14   15
+CONECT   17   18   31
+CONECT   28    5
+CONECT   12    9   29
+CONECT   32   31
+END

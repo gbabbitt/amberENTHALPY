@@ -22,9 +22,9 @@ print "path to Chimera .exe\t"."$chimera_path\n";
 #### This creates a GUI to write the control files needed for the GPU accelerated pmemd.cuda pipeline ####
 
 #### Declare variables ####
-my $fileIDq = '1yet_bound';
-my $fileIDr = '1yet_unbound';
-my $fileIDl = '1yet_ligand';
+my $fileIDq = '1uwh_bound';
+my $fileIDr = '1uwh_unbound';
+my $fileIDl = '1uwh_ligand';
 my $fileIDw = 'singleWater';
 my $forceID = 'leaprc.protein.ff14SB';
 my $dforceID = 'leaprc.gaff2';
@@ -42,8 +42,8 @@ my $cutoffValueEqFS=0;
 my $cutoffValueProdFS=0;
 my $solvBoxCOMPLEX = 30;
 my $solvBoxHOST = 30;
-my $solvBoxGUEST = 49.5;
-my $solvBoxWATER = 54;
+my $solvBoxGUEST = 51;
+my $solvBoxWATER = 57;
 my @fullfile;
 my @chainlen;
 my @fullfile2;
@@ -1147,18 +1147,18 @@ for (my $k = 0; $k < scalar @IN1; $k++){
         @IN2row = split(/\s+/, $IN2row);
         @IN3row = split(/\s+/, $IN3row);
         @IN4row = split(/\s+/, $IN4row);
-        $EP_complex = $IN1row[2];
-        $EP_host = $IN2row[2];
-        $EP_guest = $IN3row[2];
-        $EP_water = $IN4row[2];
-        #print "EP complex = "."$EP_complex\n";
-        #print "EP water = "."$EP_water\n";
-        #print "EP host = "."$EP_host\n";
-        #print "EP guest = "."$EP_guest\n";
-        push (@energy_complex, $EP_complex);
-        push (@energy_host, $EP_host);
-        push (@energy_guest, $EP_guest);
-        push (@energy_water, $EP_water);
+        $E_complex = $IN1row[0];
+        $E_host = $IN2row[0];
+        $E_guest = $IN3row[0];
+        $E_water = $IN4row[0];
+        #print "E complex = "."$E_complex\n";
+        #print "E water = "."$E_water\n";
+        #print "E host = "."$E_host\n";
+        #print "E guest = "."$E_guest\n";
+        push (@energy_complex, $E_complex);
+        push (@energy_host, $E_host);
+        push (@energy_guest, $E_guest);
+        push (@energy_water, $E_water);
         }
      close IN1;
      close IN2;
