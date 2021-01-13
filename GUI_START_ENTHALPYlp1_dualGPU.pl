@@ -908,6 +908,39 @@ print "(see https://ambermd.org/tutorials/advanced/tutorial21/index.php)\n\n";
 SKIP:
 }
 
+######################################################################################################
+sub reduce { # create PDB files for teLeap
+sleep(1);print "DO YOU WANT TO REDUCE THE ENTIRE STRUCTURE? (y or n)\n";
+print "i.e. answer 'n' if protonation state is already prepared ahead of time \n";
+my $reduce_enter = <STDIN>;
+chop($reduce_enter); # NOTE: for binding enthalpy crystallographic waters are not removed
+if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry --reduce \n";}
+if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry \n";}
+if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry --reduce \n";}
+if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry \n";}
+if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDl.pdb -o ".$fileIDl."REDUCED.pdb --dry --reduce \n";}
+if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDl.pdb -o ".$fileIDl."REDUCED.pdb --dry \n";}
+if ($reduce_enter eq "y"){system "pdb4amber -i $fileIDw.pdb -o ".$fileIDw."REDUCED.pdb --reduce \n";}
+if ($reduce_enter eq "n"){system "pdb4amber -i $fileIDw.pdb -o ".$fileIDw."REDUCED.pdb \n";}
+if ($reduce_enter eq "yes"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry --reduce \n";}
+if ($reduce_enter eq "no"){system "pdb4amber -i $fileIDq.pdb -o ".$fileIDq."REDUCED.pdb --dry \n";}
+if ($reduce_enter eq "yes"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry --reduce \n";}
+if ($reduce_enter eq "no"){system "pdb4amber -i $fileIDr.pdb -o ".$fileIDr."REDUCED.pdb --dry \n";}
+if ($reduce_enter eq "yes"){system "pdb4amber -i $fileIDl.pdb -o ".$fileIDl."REDUCED.pdb --dry --reduce \n";}
+if ($reduce_enter eq "no"){system "pdb4amber -i $fileIDl.pdb -o ".$fileIDl."REDUCED.pdb --dry \n";}
+if ($reduce_enter eq "yes"){system "pdb4amber -i $fileIDw.pdb -o ".$fileIDw."REDUCED.pdb --reduce \n";}
+if ($reduce_enter eq "no"){system "pdb4amber -i $fileIDw.pdb -o ".$fileIDw."REDUCED.pdb \n";}
+sleep(1);
+print "opening USCF Chimera and loading both PDB structures\n\n";
+print "CHECK THAT ALL CHAINS ARE NUMBERED SEQUENTIALLY STARTING FROM 1 to END OF LAST CHAIN\n";
+print "(use Tools/Structure Editing/Renumber Residues)\n\n";
+system("$chimera_path"."chimera $fileIDr"."REDUCED.pdb\n");
+system("$chimera_path"."chimera $fileIDq"."REDUCED.pdb\n");
+system("$chimera_path"."chimera $fileIDl"."REDUCED.pdb\n");
+system("$chimera_path"."chimera $fileIDw"."REDUCED.pdb\n");
+sleep(1);
+print "\n\npdb4amber is completed\n\n";
+}
 
 ######################################################################################################
 sub antechamber {
