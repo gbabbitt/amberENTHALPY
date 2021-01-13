@@ -256,15 +256,15 @@ open(SANDER_PROD_AA, ">"."$protein_label"."_prod.in") or die "could not open SAN
 close SANDER_PROD_AA;
 sleep(1);
 
-my $run_method = "pmemd1.cuda_SPFP"; # "sander" for CPU or "pmemd.cuda" for GPU;
-my $method_ID = "pmemd1";
+my $run_method = "pmemd0.cuda_SPFP"; # "sander" for CPU or "pmemd.cuda" for GPU;
+my $method_ID = "pmemd0";
 ###############################################################
 # Amino Acid: Run minimization in sander
 ###############################################################
 
 print "\n\n\ starting min run for "."min_$protein_label.out\n";
 
-system("export CUDA_VISIBLE_DEVICES=1\n".'$AMBERHOME'."/bin/$run_method -O -i $protein_label"."_min.in -o min_$protein_label.out -p $prmtop"."_$protein_label.prmtop -c $prmtop"."_$protein_label.inpcrd -r min_$protein_label.rst -inf min_$protein_label.mdinfo &");
+system("export CUDA_VISIBLE_DEVICES=0\n".'$AMBERHOME'."/bin/$run_method -O -i $protein_label"."_min.in -o min_$protein_label.out -p $prmtop"."_$protein_label.prmtop -c $prmtop"."_$protein_label.inpcrd -r min_$protein_label.rst -inf min_$protein_label.mdinfo &");
 #-x min_$protein_label.nc
 $seconds = 0;
 $timestep = 10;
@@ -299,7 +299,7 @@ print "\ starting heating run for "."heat_$protein_label.out\n";
 #if (-e "heat_$protein_label.rst") { print ".rst file found\n"; }
 #if (-e "heat_$protein_label.nc") { print "nc found\n"; }
 #if (-e "heat_$protein_label.mdinfo") { print "info file found\n"; }
-system("export CUDA_VISIBLE_DEVICES=1\n"."$run_method -O -i $protein_label"."_heat.in -o heat_$protein_label.out -p $prmtop"."_$protein_label.prmtop -c min_$protein_label.rst -r heat_$protein_label.rst -x heat_$protein_label.nc -inf heat_$protein_label.mdinfo &");
+system("export CUDA_VISIBLE_DEVICES=0\n"."$run_method -O -i $protein_label"."_heat.in -o heat_$protein_label.out -p $prmtop"."_$protein_label.prmtop -c min_$protein_label.rst -r heat_$protein_label.rst -x heat_$protein_label.nc -inf heat_$protein_label.mdinfo &");
 #system("export CUDA_VISIBLE_DEVICES=0\n".'$AMBERHOME'."/AmberTools/bin/$run_method -O -i $protein_label"."_heat.in -o heat_$protein_label.out -p wat_$protein_label.prmtop -c wat_$protein_label.inpcrd -r heat_$protein_label.rst -x heat_$protein_label.nc -inf heat_$protein_label.mdinfo &");
 
 $seconds = 0;
@@ -328,7 +328,7 @@ sleep(1);
 # Amino Acid: Run equilibration MD in sander
 ######################################################################
 print "\ starting eq run for "."eq_$protein_label.out\n";
-system("export CUDA_VISIBLE_DEVICES=1\n"."$run_method -O -i $protein_label"."_eq.in -o eq_$protein_label.out -p $prmtop"."_$protein_label.prmtop -c heat_$protein_label.rst -r eq_$protein_label.rst -x eq_$protein_label.nc -inf eq_$protein_label.info &");
+system("export CUDA_VISIBLE_DEVICES=0\n"."$run_method -O -i $protein_label"."_eq.in -o eq_$protein_label.out -p $prmtop"."_$protein_label.prmtop -c heat_$protein_label.rst -r eq_$protein_label.rst -x eq_$protein_label.nc -inf eq_$protein_label.info &");
 
 $seconds = 0;
 $timestep = 60;
@@ -403,7 +403,7 @@ sleep(1);
 ######################################################################
 for (my $jj = 0; $jj < $num_runs; $jj++) {
 print "\ starting MD run for "."rand_$protein_label"."_$jj.out\n";
-system("export CUDA_VISIBLE_DEVICES=1\n"."$run_method -O -i $protein_label"."_rand$jj.in -o rand_$protein_label"."_$jj.out -p $prmtop"."_$protein_label.prmtop -c eq_$protein_label.rst -r rand_$protein_label"."_$jj.rst -x rand_$protein_label"."_$jj.nc -inf rand_$protein_label"."_$jj.info &");
+system("export CUDA_VISIBLE_DEVICES=0\n"."$run_method -O -i $protein_label"."_rand$jj.in -o rand_$protein_label"."_$jj.out -p $prmtop"."_$protein_label.prmtop -c eq_$protein_label.rst -r rand_$protein_label"."_$jj.rst -x rand_$protein_label"."_$jj.nc -inf rand_$protein_label"."_$jj.info &");
 
 $seconds = 0;
 $timestep = 10;
@@ -437,7 +437,7 @@ sleep(1);
 ######################################################################
 for (my $jj = 0; $jj < $num_runs; $jj++) {
 print "\ starting MD run for "."prod_$protein_label"."_$jj.out\n";
-system("export CUDA_VISIBLE_DEVICES=1\n"."$run_method -O -i $protein_label"."_prod.in -o prod_$protein_label"."_$jj.out -p $prmtop"."_$protein_label.prmtop -c rand_$protein_label"."_$jj.rst -r prod_$protein_label.rst -x prod_$protein_label"."_$jj.nc -inf prod_$protein_label"."_$jj.info &");
+system("export CUDA_VISIBLE_DEVICES=0\n"."$run_method -O -i $protein_label"."_prod.in -o prod_$protein_label"."_$jj.out -p $prmtop"."_$protein_label.prmtop -c rand_$protein_label"."_$jj.rst -r prod_$protein_label.rst -x prod_$protein_label"."_$jj.nc -inf prod_$protein_label"."_$jj.info &");
 
 $seconds = 0;
 $timestep = 10;
